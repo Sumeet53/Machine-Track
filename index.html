@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#F4F6F8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>MachineTrack — Simple Machine Uptime &amp; Maintenance Monitoring</title>
+<style>
+  :root{
+    --bg: #F3F5F7;
+    --surface: #FFFFFF;
+    --surface-2: #EEF1F5;
+    --hairline: #E1E6EB;
+    --text: #1B222B;
+    --text-dim: #5C6673;
+    --text-faint: #8992A0;
+    --run: #1F9D74;
+    --run-dim: #E1F5ED;
+    --break: #D14827;
+    --break-dim: #FCE7E1;
+    --prev: #D9720B;
+    --prev-dim: #FCEBD9;
+    --off: #14161A;
+    --off-dim: #E7E9EC;
+    --accent: #2E7FD6;
+    --accent-dim: #E6F0FB;
+    --on-accent: #FFFFFF;
+    --radius: 14px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; min-width:0;}
+  html,body{margin:0; padding:0; height:100%; overflow-x:hidden; width:100%;}
+  body{
+    background: radial-gradient(1200px 600px at 50% -10%, #FFFFFF 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, "Inter", Arial, sans-serif;
+    min-height: 100%;
+    overflow-wrap: anywhere;
+  }
+  .display{ font-family: "Oswald", "Arial Narrow", "Segoe UI", sans-serif; font-stretch: condensed; letter-spacing: 0.01em; }
+  button, input, textarea, select{ font-family: inherit; max-width:100%; }
+  img, svg{ max-width:100%; }
+
+  /* ---------- Auth screen ---------- */
+  #authScreen{
+    min-height: 100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 24px; padding-top: calc(24px + var(--safe-top)); text-align:center;
+  }
+  .auth-card{ width:100%; max-width: 380px; text-align:left; }
+  .auth-brand{ text-align:center; margin-bottom: 28px; }
+  .auth-brand .wordmark{ display:flex; align-items:center; justify-content:center; gap:9px; margin-bottom:6px; }
+  .auth-brand .glyph{ font-size:26px; line-height:1; }
+  .auth-brand h1{ margin:0; font-size:25px; font-weight:800; letter-spacing:-0.01em; }
+  .auth-brand .tag{ color: var(--text-faint); font-size:12.5px; line-height:1.4; }
+  .auth-tabs{ display:flex; background: var(--surface-2); border-radius: 12px; padding:4px; margin-bottom: 20px; }
+  .auth-tab{ flex:1; text-align:center; padding:10px; border-radius:9px; font-size:13.5px; font-weight:700; color: var(--text-dim); cursor:pointer; }
+  .auth-tab.active{ background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(20,24,29,0.08); }
+  .field{ margin-bottom: 16px; text-align:center; }
+  .field label{ display:block; font-size: 12px; color: var(--text-dim); margin-bottom:6px; font-weight:600;}
+  .field input[type=text], .field input[type=email], .field input[type=password], .field input[type=date],
+  .field input[type=number], .field input[type=time], .field textarea, .field select{
+    width:100%; background: var(--surface-2); border:1px solid var(--hairline); color: var(--text);
+    border-radius: 10px; padding: 12px 13px; font-size: 15px; text-align:center;
+  }
+  .field textarea{ min-height: 56px; resize: vertical; text-align:left; }
+  .auth-error{ background: var(--break-dim); color: var(--break); font-size: 13px; padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; display:none; text-align:center; }
+  .auth-error.show{ display:block; }
+  .btn{ padding: 14px; border-radius: 12px; border:none; font-size:15px; font-weight:700; cursor:pointer; text-align:center; }
+  .btn-primary{ background: var(--accent); color:var(--on-accent); width:100%; }
+  .btn-primary:disabled{ opacity:0.55; }
+  .btn-ghost{ background: var(--surface-2); color: var(--text-dim); }
+  .btn-danger{ background: var(--break-dim); color: var(--break); }
+  .auth-link{ text-align:center; margin-top:16px; font-size:13px; color: var(--accent); cursor:pointer; }
+  .auth-footer{ text-align:center; margin-top: 30px; font-size:11px; color: var(--text-faint); }
+
+  /* ---------- App shell ---------- */
+  #appShell{ display:none; padding-bottom: calc(90px + var(--safe-bottom)); text-align:center; }
+  header{
+    padding: calc(16px + var(--safe-top)) 14px 12px;
+    position: sticky; top:0; z-index: 20;
+    background: linear-gradient(180deg, rgba(243,245,247,0.98) 70%, rgba(243,245,247,0.85));
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .brand-block{ text-align:center; margin-bottom:12px; }
+  .brand-block .wordmark{ display:flex; align-items:center; justify-content:center; gap:8px; }
+  .brand-block .glyph{ font-size:20px; line-height:1; }
+  .brand-block h1{ margin:0; font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+  .brand-block .tag{ color: var(--text-faint); font-size: 11px; margin-top:3px; font-weight:600; letter-spacing:0.02em; }
+  .header-actions{ display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--hairline); background: var(--surface);
+    display:flex; align-items:center; justify-content:center; font-size:16px; flex:0 0 auto; cursor:pointer;
+  }
+
+  .machine-scroll{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; justify-content:center; flex-wrap:wrap; }
+  .machine-scroll::-webkit-scrollbar{display:none;}
+  .chip{
+    flex: 0 0 auto; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--hairline);
+    background: var(--surface); color: var(--text-dim); font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer;
+  }
+  .chip.active{ background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .chip.summary-chip{ border-style: dashed; }
+  .chip.summary-chip.active{ background: var(--text); border-color: var(--text); color:var(--on-accent);}
+
+  main{ padding: 16px; max-width: 640px; margin: 0 auto; width:100%; }
+
+  .statcard, .entry, .summary-row, .export-card, .machine-row{ box-shadow: 0 1px 3px rgba(20,24,29,0.05); }
+  .statcard{ background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; text-align:center; }
+  .statcard .machine-name{ font-size: 19px; font-weight:700; }
+  .statcard .month-label{ font-size: 12px; color: var(--text-faint); margin-top:2px; margin-bottom:14px; }
+  .bigstats{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom: 14px; justify-content:center; }
+  .bigstat{ flex:1 1 80px; text-align:center; }
+  .bigstat .num{ font-size: 24px; font-weight: 700; font-family: "Oswald", sans-serif; }
+  .bigstat.run .num{ color: var(--run); }
+  .bigstat.break .num{ color: var(--break); }
+  .bigstat .lbl{ font-size: 11px; color: var(--text-faint); margin-top:2px;}
+  .bar{ height:9px; border-radius:999px; overflow:hidden; display:flex; background: var(--off-dim); }
+  .bar .seg-run{ background: var(--run); }
+  .bar .seg-break{ background: var(--break); }
+  .eff-row{ display:flex; justify-content:center; align-items:center; gap:8px; margin-top:14px; padding-top:12px; border-top:1px dashed var(--hairline); flex-wrap:wrap; }
+  .eff-row .ul{ font-size:12px; color: var(--text-faint); }
+  .eff-row .uv{ font-size:14px; font-weight:700; color: var(--accent); }
+  .eff-bar{ height:6px; border-radius:999px; background: var(--off-dim); margin-top:8px; overflow:hidden; }
+  .eff-bar .fill{ height:100%; background: var(--accent); }
+
+  .section-title{ font-size: 13px; color: var(--text-faint); margin: 22px 4px 10px; text-align:center; }
+  .section-title .r{ display:block; font-size:11px; margin-top:2px; }
+
+  .entry{ background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; text-align:center; }
+  .entry .top{ display:flex; flex-direction:column; align-items:center; gap:2px; margin-bottom:10px;}
+  .entry .date{ font-weight: 700; font-size: 15px; }
+  .entry .day{ color: var(--text-faint); font-size: 12px; font-weight:500;}
+  .entry .avl{ font-size: 12px; color: var(--text-dim); }
+  .slots{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom: 8px; justify-content:center; }
+  .slot{ font-size: 10.5px; font-weight:700; padding: 5px 9px; border-radius: 8px; color: var(--text-dim); background: var(--off-dim); border: 1px solid var(--hairline); line-height:1.3; }
+  .slot.s-run{ background: var(--run-dim); color: var(--run); border-color: transparent;}
+  .slot.s-break{ background: var(--break-dim); color: var(--break); border-color: transparent;}
+  .slot.s-prev{ background: var(--prev-dim); color: var(--prev); border-color: transparent;}
+  .slot.s-off{ background: var(--off-dim); color: var(--off); border-color: transparent;}
+  .slot .k{ opacity:0.6; margin-right:4px; font-weight:600;}
+  .entry .remark{ font-size: 12.5px; color: var(--text-dim); margin-top:6px; line-height:1.4; text-align:center; }
+  .entry .footrow{ display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:10px;}
+  .minibar{ width:100%; height:6px; border-radius:999px; overflow:hidden; display:flex; background: var(--off-dim); }
+  .minibar .seg-run{ background: var(--run);} .minibar .seg-break{ background: var(--break);}
+  .entry.tap{ cursor:pointer; }
+
+  .empty{ text-align:center; padding: 40px 20px; color: var(--text-faint); }
+  .empty .glyph{ font-size: 30px; margin-bottom: 10px; opacity:0.5;}
+  .empty .btn-primary{ width:auto; padding:12px 22px; margin-top:14px; display:inline-block; }
+
+  .fab{
+    position: fixed; right: 20px; bottom: calc(24px + var(--safe-bottom));
+    width: 58px; height:58px; border-radius: 50%; background: var(--accent); color:var(--on-accent);
+    display:flex; align-items:center; justify-content:center; font-size: 28px; font-weight:400; border:none;
+    box-shadow: 0 6px 20px rgba(79,163,224,0.35); z-index: 30; cursor:pointer;
+  }
+  .fab:active{ transform: scale(0.94); }
+  .sync-pill{
+    position: fixed; left:50%; transform:translateX(-50%); top: calc(10px + var(--safe-top));
+    background: var(--text); color:#fff; font-size:11.5px; font-weight:600; padding:6px 14px; border-radius:999px;
+    z-index: 50; opacity:0; pointer-events:none; transition: opacity 0.25s; text-align:center; max-width:88vw;
+  }
+  .sync-pill.show{ opacity:1; }
+  .sync-pill.offline{ background: var(--break); }
+
+  .sheet-backdrop{ position:fixed; inset:0; background: rgba(20,24,29,0.45); z-index: 40; opacity:0; pointer-events:none; transition: opacity 0.2s; }
+  .sheet-backdrop.open{ opacity:1; pointer-events:auto; }
+  .sheet{
+    position:fixed; left:0; right:0; bottom:0; z-index:41; background: #FFFFFF; border-top: 1px solid var(--hairline);
+    border-radius: 20px 20px 0 0; box-shadow: 0 -8px 30px rgba(20,24,29,0.12); padding: 10px 18px calc(20px + var(--safe-bottom));
+    max-height: 88vh; overflow-y:auto; overflow-x:hidden; transform: translateY(100%); transition: transform 0.28s cubic-bezier(.2,.9,.3,1);
+    text-align:center;
+  }
+  .sheet.open{ transform: translateY(0); }
+  .sheet .handle{ width:36px; height:4px; background: var(--hairline); border-radius:999px; margin: 6px auto 14px;}
+  .sheet h2{ font-size:18px; margin: 0 0 14px; text-align:center; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px; }
+  .legend .li{ font-size:11px; font-weight:700; padding:5px 9px; border-radius:7px; display:flex; align-items:center; gap:5px; }
+  .legend .dot{ width:7px; height:7px; border-radius:50%; flex:0 0 auto; }
+
+  .seg-select{ display:grid; grid-template-columns: 1fr 1fr; gap:7px; }
+  .seg-btn{ padding: 11px 6px; border-radius:9px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text-dim);
+    font-size:11.5px; font-weight:700; text-align:center; cursor:pointer; white-space:normal; word-break:break-word; line-height:1.3; }
+  .seg-btn.sel-run{ background: var(--run-dim); border-color: var(--run); color: var(--run); }
+  .seg-btn.sel-break{ background: var(--break-dim); border-color: var(--break); color: var(--break); }
+  .seg-btn.sel-prev{ background: var(--prev-dim); border-color: var(--prev); color: var(--prev); }
+  .seg-btn.sel-off{ background: var(--off-dim); border-color: var(--off); color: var(--off); }
+  .shift-block{ border: 1px solid var(--hairline); border-radius: 12px; padding: 12px; margin-bottom:12px; background: rgba(20,24,29,0.02); text-align:center; }
+  .shift-block .shift-label{ font-size:12.5px; font-weight:700; color: var(--text-dim); margin-bottom:10px; }
+  .shift-block .shift-time{ font-size:10.5px; color: var(--text-faint); font-weight:500; margin-left:4px; }
+  .half-row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:6px;}
+  .half-label{ font-size: 10.5px; color: var(--text-faint); margin-bottom:5px; text-align:center; }
+  .live-calc{ display:flex; flex-wrap:wrap; gap:10px; margin: 4px 0 18px; }
+  .live-chip{ flex:1 1 80px; background: var(--surface-2); border-radius:10px; padding:10px; text-align:center;}
+  .live-chip .n{ font-size:16px; font-weight:700; font-family:"Oswald",sans-serif;}
+  .live-chip .l{ font-size:9.5px; color: var(--text-faint); margin-top:2px;}
+  .sheet-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 4px; }
+  .sheet-actions .btn{ flex:1 1 100px; }
+  .sheet-actions .btn-danger{ flex: 0 0 auto; padding: 14px 18px; }
+
+  .summary-row{ background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; cursor:pointer; text-align:center; }
+  .summary-row .name{ font-weight:700; font-size:15px; }
+  .summary-row .pct{ font-size:12px; color: var(--text-dim); margin-top:2px; margin-bottom:8px; }
+  .summary-row .eff{ font-size:11px; color: var(--text-faint); margin-top:6px; }
+  .overall{ background: linear-gradient(160deg, #E1F5ED, var(--surface)); border:1px solid var(--hairline); border-radius: var(--radius); padding: 18px; margin-bottom: 18px; text-align:center; }
+  .overall .lbl{ color: var(--text-faint); font-size:12px; margin-bottom:10px;}
+  .overall .bignum{ font-size: 32px; font-weight:700; font-family:"Oswald",sans-serif; margin-bottom:12px;}
+  .overall .split{ display:flex; justify-content:center; gap:18px; font-size:12px; color: var(--text-dim); flex-wrap:wrap; }
+
+  .today-badge{ background: var(--accent); color:var(--on-accent); font-size:10px; font-weight:700; padding: 2px 7px; border-radius:999px; }
+  .yesterday-badge{ background: var(--surface-2); color: var(--text-dim); border:1px solid var(--hairline); font-size:10px; font-weight:600; padding: 2px 7px; border-radius:999px; }
+
+  .export-card{ background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius); padding: 16px; margin-bottom: 18px; text-align:center; }
+  .export-card .et{ font-size:14px; font-weight:700; margin-bottom:4px;}
+  .export-card .ed{ font-size:12px; color:var(--text-faint); margin-bottom:14px; line-height:1.4;}
+  .export-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .btn-export{ flex:1 1 130px; padding:13px 10px; border-radius:11px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; white-space:normal; }
+  .btn-export.primary{ background: var(--accent); color:var(--on-accent); border-color:var(--accent); }
+  .btn-export:disabled{ opacity:0.55; }
+  .export-status{ font-size:11.5px; color: var(--text-faint); margin-top:10px; min-height:14px; }
+
+  .month-nav{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom: 16px; }
+  .month-arrow{ width:42px; height:42px; border-radius:50%; border:1px solid var(--hairline); background: var(--surface); color: var(--text); font-size:20px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 auto; cursor:pointer; }
+  .month-arrow:disabled{ opacity:0.35; }
+  .month-current{ text-align:center; }
+  .month-current .month-name{ font-size:17px; font-weight:700; }
+  .month-current .month-count{ font-size:11.5px; color: var(--text-faint); margin-top:2px; }
+
+  .machine-row{ background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius); padding: 13px 15px; margin-bottom: 10px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px; text-align:center; }
+  .machine-row .mn{ font-weight:700; font-size:15px; flex-basis:100%; }
+  .machine-row .me{ font-size:11.5px; color: var(--text-faint); margin-top:2px; flex-basis:100%; }
+  .machine-row .ma{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
+  .machine-row.archived{ opacity:0.55; }
+  .tiny-btn{ font-size:12px; font-weight:600; padding:7px 11px; border-radius:8px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text-dim); cursor:pointer; }
+  .tiny-btn.danger{ color: var(--break); background: var(--break-dim); border-color:transparent; }
+
+  .shift-config-row{ border:1px solid var(--hairline); border-radius:12px; padding:14px; margin-bottom:12px; background: rgba(20,24,29,0.02); text-align:center; }
+  .shift-config-row .sc-title{ font-weight:700; font-size:14px; margin-bottom:10px; }
+  .sc-grid{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .sc-field{ flex:1 1 100px; text-align:center; }
+  .sc-field label{ display:block; font-size:10.5px; color: var(--text-faint); margin-bottom:5px; font-weight:600; }
+  .sc-toggle{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px; font-size:12.5px; color: var(--text-dim); font-weight:600; }
+  .sc-toggle input{ width:17px; height:17px; }
+  .stepper{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:8px; }
+  .stepper .sv{ font-size:24px; font-weight:800; min-width:34px; text-align:center; }
+  .stepper button{ width:38px; height:38px; border-radius:50%; border:1px solid var(--hairline); background:var(--surface); font-size:18px; font-weight:700; cursor:pointer; }
+  .stepper-note{ font-size:11.5px; color:var(--text-faint); margin:-2px 0 16px; }
+
+  #loadingOverlay{
+    position:fixed; inset:0; background: var(--bg); z-index:100; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:10px; text-align:center;
+  }
+  #loadingOverlay .spin{ width:28px; height:28px; border-radius:50%; border:3px solid var(--hairline); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  #loadingOverlay .lbl{ font-size:13px; color: var(--text-faint); }
+
+  #appFooter{ max-width: 640px; margin: 8px auto 0; padding: 18px 24px calc(24px + var(--safe-bottom)); text-align: center; border-top: 1px solid var(--hairline); }
+  #appFooter .footer-line{ font-size: 11px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay"><div class="spin"></div><div class="lbl">Loading…</div></div>
+<div class="sync-pill" id="syncPill"></div>
+
+<!-- ===================== AUTH SCREEN ===================== -->
+<div id="authScreen" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="wordmark"><span class="glyph">⏱</span><h1 class="display">MachineTrack</h1></div>
+      <div class="tag">Simple Machine Uptime &amp; Maintenance Monitoring</div>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin">Log in</div>
+      <div class="auth-tab" id="tabSignup">Create account</div>
+    </div>
+
+    <div class="auth-error" id="authError"></div>
+
+    <div id="signupFields">
+      <div class="field">
+        <label>Factory / shop name</label>
+        <input type="text" id="f-factoryName" placeholder="e.g. Shree Precision Works">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="f-email" placeholder="you@company.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="f-password" placeholder="At least 6 characters" autocomplete="current-password">
+    </div>
+    <div class="field" id="confirmPasswordField" style="display:none;">
+      <label>Confirm password</label>
+      <input type="password" id="f-password2" placeholder="Re-enter password">
+    </div>
+
+    <button class="btn btn-primary" id="btnAuthSubmit">Log in</button>
+    <div class="auth-link" id="linkForgot">Forgot password?</div>
+    <div class="auth-footer">Your data is private to your account and stored securely in the cloud. It also works offline — entries sync once you're back online.</div>
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="appShell">
+  <header>
+    <div class="brand-block">
+      <div class="wordmark"><span class="glyph">⏱</span><h1 class="display">MachineTrack</h1></div>
+      <div class="tag" id="factoryTag">MACHINE STATUS</div>
+    </div>
+    <div class="header-actions">
+      <div class="icon-btn" id="btnSettings" title="Factory settings">⚙</div>
+      <div class="icon-btn" id="btnManageMachines" title="Manage machines">🏭</div>
+      <div class="icon-btn" id="btnLogout" title="Log out">⎋</div>
+    </div>
+    <div class="machine-scroll" id="machineScroll"></div>
+  </header>
+
+  <main id="main"></main>
+
+  <footer id="appFooter">
+    <div class="footer-line">Signed in as <span id="footerEmail"></span></div>
+  </footer>
+
+  <button class="fab" id="fabAdd">+</button>
+</div>
+
+<!-- ===================== DAILY ENTRY SHEET ===================== -->
+<div class="sheet-backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="handle"></div>
+  <h2 id="sheetTitle">New entry</h2>
+
+  <div class="field">
+    <label>Date</label>
+    <input type="date" id="f-date">
+  </div>
+
+  <div class="legend">
+    <span class="li" style="background:var(--run-dim);color:var(--run);"><span class="dot" style="background:var(--run);"></span>Running</span>
+    <span class="li" style="background:var(--prev-dim);color:var(--prev);"><span class="dot" style="background:var(--prev);"></span>Under Preventive Maintenance</span>
+    <span class="li" style="background:var(--break-dim);color:var(--break);"><span class="dot" style="background:var(--break);"></span>Under Maintenance</span>
+    <span class="li" style="background:var(--off-dim);color:var(--off);"><span class="dot" style="background:var(--off);"></span>Shift Off</span>
+  </div>
+
+  <div id="shiftBlocks"></div>
+
+  <div class="live-calc">
+    <div class="live-chip"><div class="n" id="lc-break" style="color:var(--break)">0</div><div class="l">BREAKDOWN HR</div></div>
+    <div class="live-chip"><div class="n" id="lc-run" style="color:var(--run)">0</div><div class="l">RUNNING HR</div></div>
+    <div class="live-chip"><div class="n" id="lc-avl">0</div><div class="l">AVAILABLE HR</div></div>
+  </div>
+
+  <div class="field">
+    <label>Type of problem / remarks</label>
+    <textarea id="f-remark" placeholder="e.g. spindle bearing noise, table drive not working"></textarea>
+  </div>
+
+  <div class="sheet-actions">
+    <button class="btn btn-danger" id="btnDelete" style="display:none;">Delete</button>
+    <button class="btn btn-ghost" id="btnCancel">Cancel</button>
+    <button class="btn btn-primary" id="btnSave">Save</button>
+  </div>
+</div>
+
+<!-- ===================== MACHINE MANAGEMENT SHEET ===================== -->
+<div class="sheet-backdrop" id="mBackdrop"></div>
+<div class="sheet" id="machineSheet">
+  <div class="handle"></div>
+  <h2>Manage machines</h2>
+  <div id="machineList"></div>
+
+  <div class="section-title" style="margin-top:20px;"><span id="machineFormTitle">Add a machine</span></div>
+  <div class="field">
+    <label>Machine name</label>
+    <input type="text" id="f-mname" placeholder="e.g. CNC Lathe 2">
+  </div>
+
+  <div class="section-title"><span>Shift schedule for this machine</span><span class="r">Each machine can run its own schedule</span></div>
+  <div class="stepper">
+    <button id="mShiftMinus">−</button>
+    <div class="sv" id="mShiftCountVal">3</div>
+    <button id="mShiftPlus">+</button>
+  </div>
+  <div class="stepper-note">Number of shifts this machine runs per day</div>
+  <div id="mShiftConfigList"></div>
+
+  <div class="sheet-actions">
+    <button class="btn btn-danger" id="btnMachineDelete" style="display:none;">Delete</button>
+    <button class="btn btn-ghost" id="btnMachineCancel">Cancel</button>
+    <button class="btn btn-primary" id="btnMachineSave">Save machine</button>
+  </div>
+</div>
+
+<!-- ===================== FACTORY SETTINGS SHEET ===================== -->
+<div class="sheet-backdrop" id="sBackdrop"></div>
+<div class="sheet" id="settingsSheet">
+  <div class="handle"></div>
+  <h2>Factory settings</h2>
+
+  <div class="field">
+    <label>Factory / shop name</label>
+    <input type="text" id="f-factoryNameEdit" placeholder="e.g. Shree Precision Works">
+  </div>
+  <div style="font-size:11.5px;color:var(--text-faint);margin:-6px 0 16px;">
+    Shift schedules are set per machine now — open a machine under 🏭 Manage machines to set its shifts.
+  </div>
+
+  <div class="sheet-actions">
+    <button class="btn btn-ghost" id="btnSettingsCancel">Cancel</button>
+    <button class="btn btn-primary" id="btnSettingsSave">Save</button>
+  </div>
+</div>
+
+<!-- ===================== Firebase SDK ===================== -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+(function(){
+  "use strict";
+
+  // =====================================================================
+  // 1. FIREBASE CONFIG — replace with your own project's values.
+  //    Firebase Console → Project settings → General → "Your apps" → SDK setup.
+  //    See SETUP.md for the full walkthrough.
+  // =====================================================================
+  var firebaseConfig = {
+    apiKey: "AIzaSyB9VVuI3rX3sKOZS1kuUPHNFuM5Ds2xEM4",
+    authDomain: "machine-track7.firebaseapp.com",
+    projectId: "machine-track7",
+    storageBucket: "machine-track7.firebasestorage.app",
+    messagingSenderId: "366122458726",
+    appId: "1:366122458726:web:2738dc11685341408cd7a7"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+  var db = firebase.firestore();
+  try{
+    db.enablePersistence({ synchronizeTabs: true }).catch(function(e){ console.warn("Offline persistence unavailable:", e.code); });
+  }catch(e){ console.warn(e); }
+
+  // ---------- Status codes ----------
+  // NOTE: Under Preventive Maintenance counts toward BREAKDOWN hours, not
+  // running hours — the machine isn't producing during UPM even though the
+  // stoppage is planned, so it belongs with Under Maintenance for uptime math.
+  var STATUSES = [
+    {id:"UP",  label:"Running",                        cls:"run"},
+    {id:"UPM", label:"Under Preventive Maintenance",    cls:"prev"},
+    {id:"UM",  label:"Under Maintenance",               cls:"break"},
+    {id:"OFF", label:"Shift Off",                       cls:"off"}
+  ];
+  var STATUS_MAP = {}; STATUSES.forEach(function(s){ STATUS_MAP[s.id]=s; });
+
+  // Default shift schedule for a newly added machine: Shift 1 & 2 split into
+  // A/B halves of 4h each, Shift 3 as one 8h block — 24h/day total.
+  // Each machine can change this to its own schedule (fewer shifts, no
+  // splits, different hours) independently of every other machine.
+  var DEFAULT_SHIFT_CONFIG = [
+    { hours: 8, startTime: "06:00", split: true },
+    { hours: 8, startTime: "14:00", split: true },
+    { hours: 8, startTime: "22:00", split: false }
+  ];
+
+  // ---------- State ----------
+  var state = {
+    uid: null,
+    email: "",
+    factoryName: "",
+    machines: [],
+    data: {},
+    active: null,
+    editing: null,
+    editingMachine: null,
+    machineDraftShifts: null,
+    summaryMonth: new Date().toISOString().slice(0,7),
+    logUnsubs: {},
+    machinesUnsub: null,
+    factoryUnsub: null,
+    authMode: "login"
+  };
+
+  function $(id){ return document.getElementById(id); }
+
+  function machineShiftConfig(machine){
+    return (machine && machine.shiftConfig && machine.shiftConfig.length) ? machine.shiftConfig : DEFAULT_SHIFT_CONFIG;
+  }
+
+  // ---------- Shift-slot derivation ----------
+  // Slot key encodes its position so historical entries stay readable even
+  // if a machine's schedule is changed later: "sh2a" -> Shift 2, half A.
+  function getSlotDefs(shiftConfig){
+    var slots = [];
+    (shiftConfig||[]).forEach(function(shift, idx){
+      var num = idx+1;
+      var hrs = (typeof shift.hours === "number" && shift.hours>0) ? shift.hours : 8;
+      if(shift.split){
+        slots.push({ key:"sh"+num+"a", shiftLabel:"Shift "+num, short:num+"A", hours: hrs/2, startTime: shift.startTime });
+        slots.push({ key:"sh"+num+"b", shiftLabel:"Shift "+num, short:num+"B", hours: hrs/2, startTime: addHours(shift.startTime, hrs/2) });
+      } else {
+        slots.push({ key:"sh"+num, shiftLabel:"Shift "+num, short:String(num), hours: hrs, startTime: shift.startTime });
+      }
+    });
+    return slots;
+  }
+  function addHours(timeStr, hrs){
+    if(!timeStr) return "";
+    var parts = timeStr.split(":").map(Number);
+    var mins = parts[0]*60 + (parts[1]||0) + hrs*60;
+    mins = ((mins % 1440) + 1440) % 1440;
+    var h = Math.floor(mins/60), m = Math.round(mins%60);
+    return String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+  }
+  function totalDailyHours(shiftConfig){
+    var t = 0;
+    (shiftConfig||[]).forEach(function(s){ t += (typeof s.hours==="number" && s.hours>0) ? s.hours : 8; });
+    return t;
+  }
+
+  // ---------- Sync indicator ----------
+  var pillTimer = null;
+  function flashSync(msg, offline){
+    var p = $("syncPill");
+    p.textContent = msg;
+    p.className = "sync-pill show" + (offline ? " offline" : "");
+    clearTimeout(pillTimer);
+    pillTimer = setTimeout(function(){ p.classList.remove("show"); }, 1800);
+  }
+  window.addEventListener("online", function(){ flashSync("Back online — syncing…", false); });
+  window.addEventListener("offline", function(){ flashSync("Offline — entries will sync later", true); });
+
+  // ---------- Auth screen wiring ----------
+  function setAuthMode(mode){
+    state.authMode = mode;
+    $("tabLogin").classList.toggle("active", mode==="login");
+    $("tabSignup").classList.toggle("active", mode==="signup");
+    $("signupFields").style.display = mode==="signup" ? "block" : "none";
+    $("confirmPasswordField").style.display = mode==="signup" ? "block" : "none";
+    $("btnAuthSubmit").textContent = mode==="signup" ? "Create account" : "Log in";
+    $("authError").classList.remove("show");
+  }
+  $("tabLogin").onclick = function(){ setAuthMode("login"); };
+  $("tabSignup").onclick = function(){ setAuthMode("signup"); };
+  function showAuthError(msg){ var e = $("authError"); e.textContent = msg; e.classList.add("show"); }
+
+  $("linkForgot").onclick = function(){
+    var email = $("f-email").value.trim();
+    if(!email){ showAuthError("Enter your email above first, then tap 'Forgot password?' again."); return; }
+    auth.sendPasswordResetEmail(email).then(function(){ showAuthError("Password reset email sent to " + email + "."); })
+      .catch(function(err){ showAuthError(err.message); });
+  };
+
+  $("btnAuthSubmit").onclick = function(){
+    var email = $("f-email").value.trim();
+    var pass = $("f-password").value;
+    $("authError").classList.remove("show");
+    if(!email || !pass){ showAuthError("Please fill in email and password."); return; }
+
+    if(state.authMode === "signup"){
+      var factoryName = $("f-factoryName").value.trim();
+      var pass2 = $("f-password2").value;
+      if(!factoryName){ showAuthError("Please enter your factory or shop name."); return; }
+      if(pass.length < 6){ showAuthError("Password must be at least 6 characters."); return; }
+      if(pass !== pass2){ showAuthError("Passwords do not match."); return; }
+
+      $("btnAuthSubmit").disabled = true;
+      auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
+        return db.collection("factories").doc(cred.user.uid).set({
+          name: factoryName,
+          ownerEmail: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).catch(function(err){ showAuthError(err.message); $("btnAuthSubmit").disabled = false; });
+    } else {
+      $("btnAuthSubmit").disabled = true;
+      auth.signInWithEmailAndPassword(email, pass).catch(function(err){ showAuthError(err.message); $("btnAuthSubmit").disabled = false; });
+    }
+  };
+
+  $("btnLogout").onclick = function(){ if(confirm("Log out?")) auth.signOut(); };
+
+  // ---------- Auth state → app bootstrap / teardown ----------
+  auth.onAuthStateChanged(function(user){
+    $("btnAuthSubmit").disabled = false;
+    teardownListeners();
+    if(user){
+      state.uid = user.uid;
+      state.email = user.email || "";
+      $("footerEmail").textContent = state.email;
+      $("authScreen").style.display = "none";
+      $("appShell").style.display = "block";
+      bootstrapFactory();
+    } else {
+      state.uid = null; state.machines = []; state.data = {}; state.active = null;
+      $("appShell").style.display = "none";
+      $("authScreen").style.display = "flex";
+      $("loadingOverlay").style.display = "none";
+      setAuthMode("login");
+    }
+  });
+
+  function teardownListeners(){
+    if(state.machinesUnsub){ state.machinesUnsub(); state.machinesUnsub = null; }
+    if(state.factoryUnsub){ state.factoryUnsub(); state.factoryUnsub = null; }
+    Object.keys(state.logUnsubs).forEach(function(mid){ state.logUnsubs[mid](); });
+    state.logUnsubs = {};
+  }
+  function factoryRef(){ return db.collection("factories").doc(state.uid); }
+  function machinesRef(){ return factoryRef().collection("machines"); }
+  function logsRef(machineId){ return machinesRef().doc(machineId).collection("logs"); }
+
+  function bootstrapFactory(){
+    $("loadingOverlay").style.display = "flex";
+    state.factoryUnsub = factoryRef().onSnapshot(function(doc){
+      var d = doc.exists ? doc.data() : {};
+      state.factoryName = d.name || "My Factory";
+      $("factoryTag").textContent = state.factoryName.toUpperCase();
+      renderAll();
+    });
+
+    state.machinesUnsub = machinesRef().orderBy("createdAt", "asc").onSnapshot(function(snap){
+      var ids = [];
+      state.machines = [];
+      snap.forEach(function(doc){ var m = doc.data(); m.id = doc.id; state.machines.push(m); ids.push(doc.id); });
+
+      ids.forEach(function(mid){
+        if(!state.logUnsubs[mid]){
+          state.data[mid] = state.data[mid] || [];
+          state.logUnsubs[mid] = logsRef(mid).onSnapshot(function(lsnap){
+            var rows = [];
+            lsnap.forEach(function(d){ var r = d.data(); r.date = d.id; rows.push(r); });
+            state.data[mid] = rows;
+            $("loadingOverlay").style.display = "none";
+            renderAll();
+          }, function(err){ console.error(err); $("loadingOverlay").style.display = "none"; });
+        }
+      });
+      Object.keys(state.logUnsubs).forEach(function(mid){
+        if(ids.indexOf(mid) === -1){ state.logUnsubs[mid](); delete state.logUnsubs[mid]; delete state.data[mid]; }
+      });
+
+      var activeMachines = state.machines.filter(function(m){ return m.active !== false; });
+      if(!state.active || (state.active !== "__SUMMARY__" && !activeMachines.find(function(m){return m.id===state.active;}))){
+        state.active = activeMachines.length ? activeMachines[0].id : "__SUMMARY__";
+      }
+      if(state.machines.length === 0){ $("loadingOverlay").style.display = "none"; }
+      renderAll();
+    }, function(err){ console.error(err); $("loadingOverlay").style.display = "none"; });
+  }
+
+  // ---------- Calculation helpers ----------
+  // Running = UP only. Breakdown = UM + UPM (preventive maintenance still
+  // means the machine isn't producing). Available = Running + Breakdown.
+  function computeRow(row, shiftConfig){
+    var slots = getSlotDefs(shiftConfig);
+    var breakHrs=0, runHrs=0;
+    slots.forEach(function(slot){
+      var st = row[slot.key];
+      if(!st || st==="OFF") return;
+      if(st==="UM" || st==="UPM") breakHrs += slot.hours;
+      else if(st==="UP") runHrs += slot.hours;
+    });
+    var avl = breakHrs + runHrs;
+    return { breakHrs: breakHrs, runHrs: runHrs, avl: avl,
+      pctBreak: avl ? (breakHrs/avl*100) : 0, pctRun: avl ? (runHrs/avl*100) : 0 };
+  }
+
+  function machineById(id){ return state.machines.find(function(m){ return m.id===id; }); }
+
+  function machineTotals(machineId, monthFilter){
+    var machine = machineById(machineId);
+    var shiftConfig = machineShiftConfig(machine);
+    var rows = state.data[machineId] || [];
+    if(monthFilter){ rows = rows.filter(function(r){ return r.date && r.date.slice(0,7)===monthFilter; }); }
+    var tB=0,tR=0,tA=0;
+    rows.forEach(function(r){ var c=computeRow(r, shiftConfig); tB+=c.breakHrs; tR+=c.runHrs; tA+=c.avl; });
+    var dayCapacity = totalDailyHours(shiftConfig);
+    var capacityTotal = dayCapacity * rows.length;
+    return {
+      breakHrs:tB, runHrs:tR, avl:tA, count: rows.length,
+      pctBreak: tA?(tB/tA*100):0, pctRun: tA?(tR/tA*100):0,
+      capacityTotal: capacityTotal, pctEfficiency: capacityTotal ? Math.min(100, tR/capacityTotal*100) : 0
+    };
+  }
+
+  function dayName(dateStr){ var d = new Date(dateStr + "T00:00:00"); return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]; }
+  function fmtDate(dateStr){
+    var d = new Date(dateStr + "T00:00:00");
+    var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return d.getDate()+"-"+months[d.getMonth()]+"-"+String(d.getFullYear()).slice(2);
+  }
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+  function relativeBadge(dateStr){
+    var today = new Date(); today.setHours(0,0,0,0);
+    var d = new Date(dateStr + "T00:00:00");
+    var diffDays = Math.round((today - d) / 86400000);
+    if(diffDays===0) return '<span class="today-badge">TODAY</span>';
+    if(diffDays===1) return '<span class="yesterday-badge">YESTERDAY</span>';
+    return "";
+  }
+  function monthLabel(monthKey){
+    var parts = monthKey.split("-");
+    var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    return months[parseInt(parts[1],10)-1] + " " + parts[0];
+  }
+  function shiftMonth(monthKey, delta){
+    var parts = monthKey.split("-").map(Number);
+    var d = new Date(parts[0], parts[1]-1+delta, 1);
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
+  }
+  function pct(n){ return (Math.round(n*10)/10).toFixed(1)+"%"; }
+  function round1(n){ return Math.round(n*10)/10; }
+  function escapeHtml(s){ var d = document.createElement("div"); d.textContent = s||""; return d.innerHTML; }
+
+  // ---------- Render: chips ----------
+  function renderChips(){
+    var el = $("machineScroll");
+    el.innerHTML = "";
+    var activeMachines = state.machines.filter(function(m){ return m.active !== false; });
+    activeMachines.forEach(function(m){
+      var c = document.createElement("div");
+      c.className = "chip" + (state.active===m.id ? " active":"");
+      c.textContent = m.name;
+      c.onclick = function(){ state.active=m.id; renderAll(); window.scrollTo(0,0); };
+      el.appendChild(c);
+    });
+    var sum = document.createElement("div");
+    sum.className = "chip summary-chip" + (state.active==="__SUMMARY__" ? " active":"");
+    sum.textContent = "Summary";
+    sum.onclick = function(){ state.active="__SUMMARY__"; renderAll(); window.scrollTo(0,0); };
+    el.appendChild(sum);
+  }
+
+  // ---------- Render: main ----------
+  function renderAll(){
+    renderChips();
+    var main = $("main");
+    main.innerHTML = "";
+    var activeMachines = state.machines.filter(function(m){ return m.active !== false; });
+
+    if(state.machines.length === 0){
+      $("fabAdd").style.display = "none";
+      var empty = document.createElement("div");
+      empty.className = "empty";
+      empty.innerHTML = '<div class="glyph">🏭</div>Add your first machine to start logging uptime.'+
+        '<div><button class="btn btn-primary" id="btnEmptyAdd">Add a machine</button></div>';
+      main.appendChild(empty);
+      $("btnEmptyAdd").onclick = function(){ openMachineSheet(null); };
+      return;
+    }
+
+    $("fabAdd").style.display = state.active==="__SUMMARY__" ? "none" : "flex";
+    if(state.active === "__SUMMARY__" || !machineById(state.active)){ renderSummary(main); }
+    else { renderMachine(main, state.active); }
+  }
+
+  function renderMachine(main, machineId){
+    var m = machineById(machineId);
+    var shiftConfig = machineShiftConfig(m);
+    var rows = (state.data[machineId]||[]).slice().sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+    var tot = machineTotals(machineId);
+
+    var card = document.createElement("div");
+    card.className = "statcard";
+    card.innerHTML =
+      '<div class="machine-name">'+escapeHtml(m.name)+'</div>'+
+      '<div class="month-label">'+rows.length+' entries logged</div>'+
+      '<div class="bigstats">'+
+        '<div class="bigstat run"><div class="num">'+round1(tot.runHrs)+'h</div><div class="lbl">Running</div></div>'+
+        '<div class="bigstat break"><div class="num">'+round1(tot.breakHrs)+'h</div><div class="lbl">Breakdown</div></div>'+
+        '<div class="bigstat"><div class="num" style="color:var(--text-dim)">'+round1(tot.avl)+'h</div><div class="lbl">Available</div></div>'+
+      '</div>'+
+      '<div class="bar"><div class="seg-run" style="width:'+tot.pctRun+'%"></div><div class="seg-break" style="width:'+tot.pctBreak+'%"></div></div>'+
+      '<div class="eff-row"><span class="ul">Running Efficiency</span><span class="uv">'+pct(tot.pctEfficiency)+'</span></div>'+
+      '<div class="eff-bar"><div class="fill" style="width:'+tot.pctEfficiency+'%"></div></div>';
+    main.appendChild(card);
+
+    var st = document.createElement("div");
+    st.className = "section-title";
+    st.innerHTML = "DAILY LOG <span class='r'>Newest first</span>";
+    main.appendChild(st);
+
+    if(rows.length===0){
+      var empty = document.createElement("div");
+      empty.className = "empty";
+      empty.innerHTML = '<div class="glyph">＋</div>Tap the + button to log the first entry for '+escapeHtml(m.name);
+      main.appendChild(empty);
+      return;
+    }
+
+    rows.forEach(function(row){
+      var c = computeRow(row, shiftConfig);
+      var e = document.createElement("div");
+      e.className = "entry tap";
+      var slotsHtml = getSlotDefs(shiftConfig).map(function(slot){
+        var st2 = STATUS_MAP[row[slot.key]];
+        if(!st2) return "";
+        return '<div class="slot s-'+st2.cls+'"><span class="k">'+slot.short+'</span>'+st2.label+'</div>';
+      }).join("");
+      e.innerHTML =
+        '<div class="top"><div><span class="date">'+fmtDate(row.date)+'</span> <span class="day">'+dayName(row.date)+'</span> '+relativeBadge(row.date)+'</div>'+
+        '<div class="avl">'+round1(c.avl)+'h available</div></div>'+
+        '<div class="slots">'+slotsHtml+'</div>'+
+        (row.remark ? '<div class="remark">'+escapeHtml(row.remark)+'</div>' : '')+
+        '<div class="footrow"><div class="minibar"><div class="seg-run" style="width:'+c.pctRun+'%"></div><div class="seg-break" style="width:'+c.pctBreak+'%"></div></div>'+
+        '<span style="font-size:11px;color:var(--text-faint)">'+pct(c.pctRun)+' running</span></div>';
+      e.onclick = function(){ openSheet(machineId, row.date); };
+      main.appendChild(e);
+    });
+  }
+
+  function renderSummary(main){
+    var mKey = state.summaryMonth;
+    var activeMachines = state.machines.filter(function(m){ return m.active !== false; });
+    var overallB=0, overallR=0, overallA=0, totalEntries=0;
+    activeMachines.forEach(function(m){
+      var t = machineTotals(m.id, mKey);
+      overallB+=t.breakHrs; overallR+=t.runHrs; overallA+=t.avl; totalEntries+=t.count;
+    });
+
+    var nav = document.createElement("div");
+    nav.className = "month-nav";
+    nav.innerHTML =
+      '<button class="month-arrow" id="monthPrev">‹</button>'+
+      '<div class="month-current"><div class="month-name">'+monthLabel(mKey)+'</div><div class="month-count">'+totalEntries+' entries logged</div></div>'+
+      '<button class="month-arrow" id="monthNext" '+(mKey>=new Date().toISOString().slice(0,7) ? "disabled":"")+'>›</button>';
+    main.appendChild(nav);
+    $("monthPrev").onclick = function(){ state.summaryMonth = shiftMonth(mKey,-1); renderAll(); };
+    $("monthNext").onclick = function(){ state.summaryMonth = shiftMonth(mKey,1); renderAll(); };
+
+    var ov = document.createElement("div");
+    ov.className = "overall";
+    ov.innerHTML =
+      '<div class="lbl">ALL MACHINES · AVAILABLE HOURS · '+monthLabel(mKey).toUpperCase()+'</div>'+
+      '<div class="bignum">'+round1(overallA)+'h</div>'+
+      '<div class="bar" style="height:10px;margin-bottom:10px;"><div class="seg-run" style="width:'+(overallA?overallR/overallA*100:0)+'%"></div><div class="seg-break" style="width:'+(overallA?overallB/overallA*100:0)+'%"></div></div>'+
+      '<div class="split">'+
+      '<span style="color:var(--run)">● Running '+pct(overallA?overallR/overallA*100:0)+'</span>'+
+      '<span style="color:var(--break)">● Breakdown '+pct(overallA?overallB/overallA*100:0)+'</span></div>';
+    main.appendChild(ov);
+
+    if(activeMachines.length){
+      var exp = document.createElement("div");
+      exp.className = "export-card";
+      exp.innerHTML =
+        '<div class="et">Export '+monthLabel(mKey)+'</div>'+
+        '<div class="ed">This month\'s daily log and totals for every machine, as an Excel workbook (one sheet per machine + a summary sheet).</div>'+
+        '<div class="export-actions">'+
+          '<button class="btn-export" id="btnDownloadXlsx">⬇ Download Excel</button>'+
+          '<button class="btn-export primary" id="btnEmailXlsx">✉ Email it</button>'+
+        '</div>'+
+        '<div class="export-status" id="exportStatus"></div>';
+      main.appendChild(exp);
+      $("btnDownloadXlsx").onclick = function(){ handleExport("download"); };
+      $("btnEmailXlsx").onclick = function(){ handleExport("share"); };
+    }
+
+    var st = document.createElement("div");
+    st.className = "section-title"; st.textContent = "BY MACHINE";
+    main.appendChild(st);
+
+    if(activeMachines.length===0){
+      var empty = document.createElement("div");
+      empty.className = "empty";
+      empty.innerHTML = "No active machines yet.";
+      main.appendChild(empty);
+      return;
+    }
+
+    activeMachines.forEach(function(m){
+      var t = machineTotals(m.id, mKey);
+      var row = document.createElement("div");
+      row.className = "summary-row";
+      row.innerHTML =
+        '<div class="name">'+escapeHtml(m.name)+'</div>'+
+        '<div class="pct">'+round1(t.runHrs)+'h run · '+round1(t.breakHrs)+'h down</div>'+
+        '<div class="bar"><div class="seg-run" style="width:'+t.pctRun+'%"></div><div class="seg-break" style="width:'+t.pctBreak+'%"></div></div>'+
+        '<div class="eff">Running efficiency: '+pct(t.pctEfficiency)+'</div>';
+      row.onclick = function(){ state.active = m.id; renderAll(); window.scrollTo(0,0); };
+      main.appendChild(row);
+    });
+  }
+
+  // ---------- Daily entry sheet ----------
+  var sheetSelections = {};
+  var sheetShiftConfig = DEFAULT_SHIFT_CONFIG;
+
+  function buildShiftBlocks(shiftConfig){
+    var container = $("shiftBlocks");
+    container.innerHTML = "";
+    var slots = getSlotDefs(shiftConfig);
+    var byShift = {};
+    slots.forEach(function(s){ byShift[s.shiftLabel] = byShift[s.shiftLabel] || []; byShift[s.shiftLabel].push(s); });
+
+    Object.keys(byShift).forEach(function(shiftLabel){
+      var group = byShift[shiftLabel];
+      var block = document.createElement("div");
+      block.className = "shift-block";
+      var timeRange = group[0].startTime ? ' <span class="shift-time">('+group[0].startTime+')</span>' : "";
+      block.innerHTML = '<div class="shift-label">'+shiftLabel+timeRange+'</div>';
+      var wrap = document.createElement("div");
+      wrap.className = group.length>1 ? "half-row" : "";
+      group.forEach(function(slot){
+        var col = document.createElement("div");
+        if(group.length>1){ col.innerHTML = '<div class="half-label">'+slot.short+' &middot; '+slot.hours+'h</div>'; }
+        var sel = document.createElement("div");
+        sel.className = "seg-select";
+        sel.setAttribute("data-slot", slot.key);
+        buildSegSelect(sel, slot.key);
+        col.appendChild(sel);
+        wrap.appendChild(col);
+      });
+      block.appendChild(wrap);
+      container.appendChild(block);
+    });
+  }
+
+  function buildSegSelect(container, slotKey){
+    container.innerHTML = "";
+    STATUSES.forEach(function(s){
+      var b = document.createElement("div");
+      b.className = "seg-btn";
+      b.textContent = s.label;
+      b.onclick = function(){
+        sheetSelections[slotKey] = (sheetSelections[slotKey]===s.id) ? null : s.id;
+        refreshSegUI(); refreshLiveCalc();
+      };
+      container.appendChild(b);
+    });
+  }
+  function refreshSegUI(){
+    document.querySelectorAll(".seg-select").forEach(function(container){
+      var slotKey = container.getAttribute("data-slot");
+      var btns = container.children;
+      for(var i=0;i<btns.length;i++){
+        var st = STATUSES[i];
+        btns[i].className = "seg-btn" + (sheetSelections[slotKey]===st.id ? (" sel-"+st.cls) : "");
+      }
+    });
+  }
+  function refreshLiveCalc(){
+    var fakeRow = {};
+    getSlotDefs(sheetShiftConfig).forEach(function(s){ fakeRow[s.key] = sheetSelections[s.key]; });
+    var c = computeRow(fakeRow, sheetShiftConfig);
+    $("lc-break").textContent = round1(c.breakHrs);
+    $("lc-run").textContent = round1(c.runHrs);
+    $("lc-avl").textContent = round1(c.avl);
+  }
+
+  function openSheet(machineId, date){
+    var m = machineById(machineId);
+    sheetShiftConfig = machineShiftConfig(m);
+    state.editing = { machine: machineId, date: date || null };
+    sheetSelections = {};
+    $("f-remark").value = "";
+    var useDate = date || todayStr();
+    $("f-date").value = useDate;
+
+    buildShiftBlocks(sheetShiftConfig);
+
+    var existing = (state.data[machineId]||[]).find(function(r){ return r.date===useDate; });
+    if(existing){
+      $("sheetTitle").textContent = "Edit entry · "+m.name;
+      $("f-remark").value = existing.remark || "";
+      getSlotDefs(sheetShiftConfig).forEach(function(s){ sheetSelections[s.key] = existing[s.key]||null; });
+      $("btnDelete").style.display = "block";
+      state.editing.date = useDate;
+    } else {
+      $("sheetTitle").textContent = "New entry · "+m.name;
+      $("btnDelete").style.display = "none";
+    }
+    refreshSegUI(); refreshLiveCalc();
+    $("backdrop").classList.add("open");
+    $("sheet").classList.add("open");
+  }
+  $("f-date").onchange = function(){ if(state.editing) openSheet(state.editing.machine, $("f-date").value); };
+  function closeSheet(){ $("backdrop").classList.remove("open"); $("sheet").classList.remove("open"); state.editing = null; }
+  $("backdrop").onclick = closeSheet;
+  $("btnCancel").onclick = closeSheet;
+  $("fabAdd").onclick = function(){ if(state.active==="__SUMMARY__" || !machineById(state.active)) return; openSheet(state.active, null); };
+
+  $("btnSave").onclick = function(){
+    if(!state.editing) return;
+    var machineId = state.editing.machine;
+    var date = $("f-date").value;
+    if(!date){ alert("Please pick a date."); return; }
+    var remark = $("f-remark").value.trim();
+    var rowData = { remark: remark, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+    getSlotDefs(sheetShiftConfig).forEach(function(s){ rowData[s.key] = sheetSelections[s.key] || null; });
+
+    logsRef(machineId).doc(date).set(rowData, {merge:false}).catch(function(err){
+      console.error(err); flashSync("Saved offline — will sync automatically", true);
+    });
+    closeSheet();
+  };
+  $("btnDelete").onclick = function(){
+    if(!state.editing || !state.editing.date) return;
+    if(!confirm("Delete this entry?")) return;
+    logsRef(state.editing.machine).doc(state.editing.date).delete().catch(function(err){ console.error(err); });
+    closeSheet();
+  };
+
+  // ---------- Machine management sheet ----------
+  function openMachineSheet(machineId){
+    state.editingMachine = machineId;
+    renderMachineList();
+    if(machineId){
+      var m = machineById(machineId);
+      $("machineFormTitle").textContent = "Edit machine";
+      $("f-mname").value = m.name;
+      $("btnMachineDelete").style.display = "block";
+      state.machineDraftShifts = JSON.parse(JSON.stringify(machineShiftConfig(m)));
+    } else {
+      $("machineFormTitle").textContent = "Add a machine";
+      $("f-mname").value = "";
+      $("btnMachineDelete").style.display = "none";
+      state.machineDraftShifts = JSON.parse(JSON.stringify(DEFAULT_SHIFT_CONFIG));
+    }
+    renderMachineShiftForm();
+    $("mBackdrop").classList.add("open");
+    $("machineSheet").classList.add("open");
+  }
+  function closeMachineSheet(){ $("mBackdrop").classList.remove("open"); $("machineSheet").classList.remove("open"); state.editingMachine = null; }
+  $("btnManageMachines").onclick = function(){ openMachineSheet(null); };
+  $("mBackdrop").onclick = closeMachineSheet;
+  $("btnMachineCancel").onclick = closeMachineSheet;
+
+  $("mShiftMinus").onclick = function(){ resizeMachineDraftShifts(-1); };
+  $("mShiftPlus").onclick = function(){ resizeMachineDraftShifts(1); };
+  function resizeMachineDraftShifts(delta){
+    var arr = state.machineDraftShifts;
+    var count = Math.max(1, Math.min(6, arr.length + delta));
+    if(count === arr.length) return;
+    if(count > arr.length){
+      while(arr.length < count){
+        var prev = arr[arr.length-1] || { hours:8, startTime:"06:00", split:true };
+        arr.push({ hours: 8, startTime: addHours(prev.startTime, prev.hours), split: true });
+      }
+    } else {
+      arr.length = count;
+    }
+    renderMachineShiftForm();
+  }
+
+  function renderMachineShiftForm(){
+    var arr = state.machineDraftShifts;
+    $("mShiftCountVal").textContent = arr.length;
+    var list = $("mShiftConfigList");
+    list.innerHTML = "";
+    arr.forEach(function(shift, idx){
+      var num = idx+1;
+      var row = document.createElement("div");
+      row.className = "shift-config-row";
+      row.innerHTML =
+        '<div class="sc-title">Shift '+num+'</div>'+
+        '<div class="sc-grid">'+
+          '<div class="sc-field"><label>Start time</label><input type="time" data-f="startTime" value="'+(shift.startTime||"06:00")+'"></div>'+
+          '<div class="sc-field"><label>Hours</label><input type="number" min="1" max="24" step="0.5" data-f="hours" value="'+shift.hours+'"></div>'+
+        '</div>'+
+        '<label class="sc-toggle"><input type="checkbox" data-f="split" '+(shift.split?"checked":"")+'> Split into two sub-shifts ('+num+'A / '+num+'B)</label>';
+      row.querySelector('[data-f="startTime"]').onchange = function(e){ arr[idx].startTime = e.target.value; };
+      row.querySelector('[data-f="hours"]').onchange = function(e){ var v = parseFloat(e.target.value); arr[idx].hours = (isNaN(v)||v<=0) ? 8 : v; renderTotalNote(); };
+      row.querySelector('[data-f="split"]').onchange = function(e){ arr[idx].split = e.target.checked; };
+      list.appendChild(row);
+    });
+    renderTotalNote();
+  }
+  function renderTotalNote(){
+    var old = document.getElementById("mShiftTotalNote");
+    if(old) old.remove();
+    var totalNote = document.createElement("div");
+    totalNote.id = "mShiftTotalNote";
+    totalNote.style.cssText = "font-size:11.5px;color:var(--text-faint);margin:-4px 0 16px;";
+    totalNote.textContent = "Total configured hours/day for this machine: " + totalDailyHours(state.machineDraftShifts) + "h — used for Running Efficiency.";
+    $("mShiftConfigList").appendChild(totalNote);
+  }
+
+  function deleteMachine(mid, name){
+    var typed = prompt('This permanently deletes "'+name+'" and every logged entry for it.\nType the machine name to confirm:');
+    if(typed !== name) return;
+    logsRef(mid).get().then(function(snap){
+      var batch = db.batch();
+      snap.forEach(function(d){ batch.delete(d.ref); });
+      batch.delete(machinesRef().doc(mid));
+      return batch.commit();
+    }).catch(function(err){ console.error(err); alert("Couldn't delete — check your connection and try again."); });
+  }
+
+  function renderMachineList(){
+    var list = $("machineList");
+    list.innerHTML = "";
+    if(state.machines.length===0){
+      list.innerHTML = '<div style="font-size:12.5px;color:var(--text-faint);padding:4px 2px 12px;">No machines yet — add your first one below.</div>';
+      return;
+    }
+    state.machines.forEach(function(m){
+      var shiftsN = machineShiftConfig(m).length;
+      var row = document.createElement("div");
+      row.className = "machine-row" + (m.active===false ? " archived" : "");
+      row.innerHTML =
+        '<div class="mn">'+escapeHtml(m.name)+(m.active===false?' <span style="font-size:10px;color:var(--text-faint);">(archived)</span>':'')+'</div>'+
+        '<div class="me">'+shiftsN+' shift'+(shiftsN===1?"":"s")+' / day &middot; '+totalDailyHours(machineShiftConfig(m))+'h configured</div>'+
+        '<div class="ma">'+
+          '<button class="tiny-btn" data-act="edit">Edit</button>'+
+          '<button class="tiny-btn" data-act="toggle">'+(m.active===false?'Restore':'Archive')+'</button>'+
+          '<button class="tiny-btn danger" data-act="delete">Delete</button>'+
+        '</div>';
+      row.querySelector('[data-act="edit"]').onclick = function(){ openMachineSheet(m.id); };
+      row.querySelector('[data-act="toggle"]').onclick = function(){
+        machinesRef().doc(m.id).update({ active: m.active===false ? true : false }).catch(function(err){ console.error(err); });
+      };
+      row.querySelector('[data-act="delete"]').onclick = function(){ deleteMachine(m.id, m.name); };
+      list.appendChild(row);
+    });
+  }
+
+  $("btnMachineSave").onclick = function(){
+    var name = $("f-mname").value.trim();
+    if(!name){ alert("Please enter a machine name."); return; }
+    var shiftConfig = state.machineDraftShifts;
+    if(state.editingMachine){
+      machinesRef().doc(state.editingMachine).update({ name: name, shiftConfig: shiftConfig }).catch(function(err){ console.error(err); });
+    } else {
+      machinesRef().add({ name: name, shiftConfig: shiftConfig, active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(function(err){ console.error(err); });
+    }
+    closeMachineSheet();
+  };
+  $("btnMachineDelete").onclick = function(){
+    if(!state.editingMachine) return;
+    var m = machineById(state.editingMachine);
+    deleteMachine(m.id, m.name);
+    closeMachineSheet();
+  };
+
+  // ---------- Factory settings sheet (name only — shifts are per-machine) ----------
+  $("btnSettings").onclick = function(){
+    $("f-factoryNameEdit").value = state.factoryName;
+    $("sBackdrop").classList.add("open");
+    $("settingsSheet").classList.add("open");
+  };
+  function closeSettingsSheet(){ $("sBackdrop").classList.remove("open"); $("settingsSheet").classList.remove("open"); }
+  $("sBackdrop").onclick = closeSettingsSheet;
+  $("btnSettingsCancel").onclick = closeSettingsSheet;
+  $("btnSettingsSave").onclick = function(){
+    var name = $("f-factoryNameEdit").value.trim();
+    if(!name){ alert("Please enter a factory or shop name."); return; }
+    factoryRef().update({ name: name }).catch(function(err){ console.error(err); });
+    closeSettingsSheet();
+  };
+
+  // ---------- Excel export ----------
+  function statusLabel(id){ return id ? (STATUS_MAP[id] ? STATUS_MAP[id].label : id) : ""; }
+
+  function buildWorkbook(monthKey){
+    var wb = XLSX.utils.book_new();
+    var activeMachines = state.machines.filter(function(m){ return m.active !== false; });
+
+    var summaryAoa = [["Factory", state.factoryName], ["Month", monthLabel(monthKey)], [],
+      ["Machine","Running Hrs","Breakdown Hrs","Available Hrs","% Running","% Breakdown","Running Efficiency %","Shifts/Day","Hrs Configured/Day"]];
+    var oB=0,oR=0,oA=0;
+    activeMachines.forEach(function(m){
+      var t = machineTotals(m.id, monthKey);
+      var sc = machineShiftConfig(m);
+      oB+=t.breakHrs; oR+=t.runHrs; oA+=t.avl;
+      summaryAoa.push([m.name, round1(t.runHrs), round1(t.breakHrs), round1(t.avl), Math.round(t.pctRun*10)/10, Math.round(t.pctBreak*10)/10, Math.round(t.pctEfficiency*10)/10, sc.length, totalDailyHours(sc)]);
+    });
+    summaryAoa.push(["TOTAL", round1(oR), round1(oB), round1(oA), oA?Math.round(oR/oA*1000)/10:0, oA?Math.round(oB/oA*1000)/10:0, "", "", ""]);
+    var summarySheet = XLSX.utils.aoa_to_sheet(summaryAoa);
+    summarySheet["!cols"] = [{wch:16},{wch:12},{wch:14},{wch:14},{wch:11},{wch:13},{wch:16},{wch:11},{wch:15}];
+    XLSX.utils.book_append_sheet(wb, summarySheet, "SUMMARY");
+
+    activeMachines.forEach(function(m){
+      var shiftConfig = machineShiftConfig(m);
+      var slotDefs = getSlotDefs(shiftConfig);
+      var slotCols = slotDefs.map(function(s){ return s.shiftLabel + (isNaN(s.short) ? " - "+s.short.slice(-1) : ""); });
+      var rows = (state.data[m.id]||[])
+        .filter(function(r){ return r.date && r.date.slice(0,7)===monthKey; })
+        .slice().sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+      var aoa = [["Date","Day"].concat(slotCols).concat(["Remarks","Breakdown Hrs","Running Hrs","Available Hrs","% Breakdown","% Running"])];
+      rows.forEach(function(r){
+        var c = computeRow(r, shiftConfig);
+        var slotVals = slotDefs.map(function(s){ return statusLabel(r[s.key]); });
+        aoa.push([ fmtDate(r.date), dayName(r.date) ].concat(slotVals).concat([
+          r.remark || "", round1(c.breakHrs), round1(c.runHrs), round1(c.avl),
+          Math.round(c.pctBreak*10)/10, Math.round(c.pctRun*10)/10 ]));
+      });
+      var t = machineTotals(m.id, monthKey);
+      if(rows.length===0){ aoa.push(["No entries logged this month"]); }
+      var pad = new Array(slotCols.length).fill("");
+      aoa.push(["",""].concat(pad).concat(["TOTAL", round1(t.breakHrs), round1(t.runHrs), round1(t.avl), Math.round(t.pctBreak*10)/10, Math.round(t.pctRun*10)/10]));
+      var ws = XLSX.utils.aoa_to_sheet(aoa);
+      var sheetName = m.name.replace(/[\\/?*\[\]:]/g,"").slice(0,31) || "Machine";
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    });
+    return wb;
+  }
+
+  function downloadBlob(blob, filename){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+  function setExportStatus(msg){ var el = $("exportStatus"); if(el) el.textContent = msg; }
+
+  function handleExport(mode){
+    if(typeof XLSX === "undefined"){ setExportStatus("Couldn't load the Excel library — check your internet connection and try again."); return; }
+    var dlBtn = $("btnDownloadXlsx"), emBtn = $("btnEmailXlsx");
+    if(dlBtn) dlBtn.disabled = true; if(emBtn) emBtn.disabled = true;
+    setExportStatus(mode==="share" ? "Preparing file to share…" : "Preparing download…");
+
+    setTimeout(function(){
+      try{
+        var mKey = state.summaryMonth;
+        var wb = buildWorkbook(mKey);
+        var wbout = XLSX.write(wb, {bookType:"xlsx", type:"array"});
+        var blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+        var filename = "MachineTrack-"+state.factoryName.replace(/[^a-z0-9]+/gi,"-")+"-"+mKey+".xlsx";
+
+        if(mode==="download"){
+          downloadBlob(blob, filename);
+          setExportStatus("Downloaded "+filename);
+        } else {
+          var file = new File([blob], filename, {type: blob.type});
+          if(navigator.canShare && navigator.canShare({files:[file]})){
+            navigator.share({ files: [file], title: "Machine Status Summary — "+monthLabel(mKey), text: "Machine status summary for "+monthLabel(mKey) })
+              .then(function(){ setExportStatus("Shared. Pick your email app from the share sheet."); })
+              .catch(function(err){
+                if(err && err.name === "AbortError"){ setExportStatus(""); }
+                else { setExportStatus("Couldn't share — file was downloaded instead."); downloadBlob(blob, filename); }
+              });
+          } else {
+            downloadBlob(blob, filename);
+            setExportStatus("Downloaded "+filename+" — attach it in the email that just opened.");
+            window.location.href = "mailto:?subject="+encodeURIComponent("Machine Status Summary — "+monthLabel(mKey))+
+              "&body="+encodeURIComponent("Hi,\n\nPlease find the machine status summary attached ("+filename+").\n\nThis device's browser can't attach files automatically — please attach the file that was just downloaded before sending.");
+          }
+        }
+      } catch(e){
+        setExportStatus("Something went wrong generating the file. Please try again.");
+      } finally {
+        if(dlBtn) dlBtn.disabled = false; if(emBtn) emBtn.disabled = false;
+      }
+    }, 30);
+  }
+
+  // ---------- Service worker (PWA) ----------
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(){ /* offline shell caching unavailable, app still works online */ });
+    });
+  }
+})();
+</script>
+</body>
+</html>
