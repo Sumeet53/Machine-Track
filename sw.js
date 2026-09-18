@@ -4,13 +4,15 @@
 // (googleapis.com) are left untouched — Firestore's own offline
 // persistence (enabled in index.html) handles those.
 
-var CACHE_NAME = "machinetrack-shell-v3";
+var CACHE_NAME = "machinetrack-shell-v4";
 var SHELL_FILES = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./icons/icon-maskable-192.png",
+  "./icons/icon-maskable-512.png",
   "https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js",
   "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js",
   "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js",
