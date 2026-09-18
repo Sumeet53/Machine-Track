@@ -11,6 +11,9 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>MachineTrack — Simple Machine Uptime &amp; Maintenance Monitoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #F3F5F7;
@@ -40,11 +43,12 @@
   body{
     background: radial-gradient(1200px 600px at 50% -10%, #FFFFFF 0%, var(--bg) 55%);
     color: var(--text);
-    font-family: -apple-system, "Segoe UI", Roboto, "Inter", Arial, sans-serif;
+    font-family: "Inter", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size:16.3px;
     min-height: 100%;
     overflow-wrap: anywhere;
   }
-  .display{ font-family: "Oswald", "Arial Narrow", "Segoe UI", sans-serif; font-stretch: condensed; letter-spacing: 0.01em; }
+  .display{ font-family: "Oswald", "Arial Narrow", "Segoe UI", sans-serif; font-weight:600; letter-spacing: 0.01em; }
   button, input, textarea, select{ font-family: inherit; max-width:100%; }
   img, svg{ max-width:100%; }
 
@@ -58,27 +62,27 @@
   .auth-brand .wordmark{ display:flex; align-items:center; justify-content:center; gap:9px; margin-bottom:6px; }
   .auth-brand .glyph{ font-size:26px; line-height:1; }
   .auth-brand h1{ margin:0; font-size:25px; font-weight:800; letter-spacing:-0.01em; }
-  .auth-brand .tag{ color: var(--text-faint); font-size:12.5px; line-height:1.4; }
+  .auth-brand .tag{ color: var(--text-faint); font-size:13.6px; line-height:1.4; }
   .auth-tabs{ display:flex; background: var(--surface-2); border-radius: 12px; padding:4px; margin-bottom: 20px; }
-  .auth-tab{ flex:1; text-align:center; padding:10px; border-radius:9px; font-size:13.5px; font-weight:700; color: var(--text-dim); cursor:pointer; }
+  .auth-tab{ flex:1; text-align:center; padding:10px; border-radius:9px; font-size:14.6px; font-weight:700; color: var(--text-dim); cursor:pointer; }
   .auth-tab.active{ background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(20,24,29,0.08); }
   .field{ margin-bottom: 16px; text-align:center; }
-  .field label{ display:block; font-size: 12px; color: var(--text-dim); margin-bottom:6px; font-weight:600;}
+  .field label{ display:block; font-size:13.3px; color: var(--text-dim); margin-bottom:6px; font-weight:600;}
   .field input[type=text], .field input[type=email], .field input[type=password], .field input[type=date],
   .field input[type=number], .field input[type=time], .field textarea, .field select{
     width:100%; background: var(--surface-2); border:1px solid var(--hairline); color: var(--text);
-    border-radius: 10px; padding: 12px 13px; font-size: 15px; text-align:center;
+    border-radius: 10px; padding: 12px 13px; font-size:15.8px; text-align:center;
   }
   .field textarea{ min-height: 56px; resize: vertical; text-align:left; }
-  .auth-error{ background: var(--break-dim); color: var(--break); font-size: 13px; padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; display:none; text-align:center; }
+  .auth-error{ background: var(--break-dim); color: var(--break); font-size:14.1px; padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; display:none; text-align:center; }
   .auth-error.show{ display:block; }
-  .btn{ padding: 14px; border-radius: 12px; border:none; font-size:15px; font-weight:700; cursor:pointer; text-align:center; }
+  .btn{ padding: 14px; border-radius: 12px; border:none; font-size:15.8px; font-weight:700; cursor:pointer; text-align:center; }
   .btn-primary{ background: var(--accent); color:var(--on-accent); width:100%; }
   .btn-primary:disabled{ opacity:0.55; }
   .btn-ghost{ background: var(--surface-2); color: var(--text-dim); }
   .btn-danger{ background: var(--break-dim); color: var(--break); }
-  .auth-link{ text-align:center; margin-top:16px; font-size:13px; color: var(--accent); cursor:pointer; }
-  .auth-footer{ text-align:center; margin-top: 30px; font-size:11px; color: var(--text-faint); }
+  .auth-link{ text-align:center; margin-top:16px; font-size:14.1px; color: var(--accent); cursor:pointer; }
+  .auth-footer{ text-align:center; margin-top: 30px; font-size:12.3px; color: var(--text-faint); }
 
   /* ---------- App shell ---------- */
   #appShell{ display:none; padding-bottom: calc(90px + var(--safe-bottom)); text-align:center; }
@@ -92,19 +96,19 @@
   .brand-block{ text-align:center; margin-bottom:12px; }
   .brand-block .wordmark{ display:flex; align-items:center; justify-content:center; gap:8px; }
   .brand-block .glyph{ font-size:20px; line-height:1; }
-  .brand-block h1{ margin:0; font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
-  .brand-block .tag{ color: var(--text-faint); font-size: 11px; margin-top:3px; font-weight:600; letter-spacing:0.02em; }
+  .brand-block h1{ margin:0; font-size:20px; font-weight: 800; letter-spacing: -0.01em; }
+  .brand-block .tag{ color: var(--text-faint); font-size:12.3px; margin-top:3px; font-weight:600; letter-spacing:0.02em; }
   .header-actions{ display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
   .icon-btn{
     width:38px; height:38px; border-radius:50%; border:1px solid var(--hairline); background: var(--surface);
-    display:flex; align-items:center; justify-content:center; font-size:16px; flex:0 0 auto; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:16.8px; flex:0 0 auto; cursor:pointer;
   }
 
   .machine-scroll{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; justify-content:center; flex-wrap:wrap; }
   .machine-scroll::-webkit-scrollbar{display:none;}
   .chip{
     flex: 0 0 auto; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--hairline);
-    background: var(--surface); color: var(--text-dim); font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer;
+    background: var(--surface); color: var(--text-dim); font-size:14.1px; font-weight: 600; white-space: nowrap; cursor: pointer;
   }
   .chip.active{ background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .chip.summary-chip{ border-style: dashed; }
@@ -114,58 +118,67 @@
 
   .statcard, .entry, .summary-row, .export-card, .machine-row{ box-shadow: 0 1px 3px rgba(20,24,29,0.05); }
   .statcard{ background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; text-align:center; }
-  .statcard .machine-name{ font-size: 19px; font-weight:700; }
-  .statcard .month-label{ font-size: 12px; color: var(--text-faint); margin-top:2px; margin-bottom:14px; }
+  .statcard .machine-name{ font-size:19px; font-weight:700; }
+  .statcard .month-label{ font-size:13.3px; color: var(--text-faint); margin-top:2px; margin-bottom:14px; }
   .bigstats{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom: 14px; justify-content:center; }
   .bigstat{ flex:1 1 80px; text-align:center; }
-  .bigstat .num{ font-size: 24px; font-weight: 700; font-family: "Oswald", sans-serif; }
+  .bigstat .num{ font-size:24px; font-weight: 700; font-family: "Oswald", sans-serif; }
   .bigstat.run .num{ color: var(--run); }
   .bigstat.break .num{ color: var(--break); }
-  .bigstat .lbl{ font-size: 11px; color: var(--text-faint); margin-top:2px;}
+  .bigstat .lbl{ font-size:12.3px; color: var(--text-faint); margin-top:2px;}
   .bar{ height:9px; border-radius:999px; overflow:hidden; display:flex; background: var(--off-dim); }
   .bar .seg-run{ background: var(--run); }
   .bar .seg-break{ background: var(--break); }
+
+  .donut{ border-radius:50%; margin:0 auto 14px; position:relative; flex:0 0 auto; }
+  .donut.nodata{ background:var(--off-dim) !important; }
+  .donut-hole{ position:absolute; inset:14%; background: var(--surface); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 0 1px var(--hairline); }
+  .donut-center{ text-align:center; padding:4px; }
+  .donut-center .dc-num{ font-size:21.5px; font-weight:700; font-family:"Oswald",sans-serif; line-height:1.1; }
+  .donut-center .dc-lbl{ font-size:9.8px; color: var(--text-faint); margin-top:3px; line-height:1.25; max-width:74px; }
+  .donut-legend{ display:flex; justify-content:center; gap:16px; font-size:12.3px; color: var(--text-dim); flex-wrap:wrap; margin-top:2px; }
+  .donut-legend .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:5px; vertical-align:middle; }
   .eff-row{ display:flex; justify-content:center; align-items:center; gap:8px; margin-top:14px; padding-top:12px; border-top:1px dashed var(--hairline); flex-wrap:wrap; }
-  .eff-row .ul{ font-size:12px; color: var(--text-faint); }
-  .eff-row .uv{ font-size:14px; font-weight:700; color: var(--accent); }
+  .eff-row .ul{ font-size:13.3px; color: var(--text-faint); }
+  .eff-row .uv{ font-size:15.1px; font-weight:700; color: var(--accent); }
   .eff-bar{ height:6px; border-radius:999px; background: var(--off-dim); margin-top:8px; overflow:hidden; }
   .eff-bar .fill{ height:100%; background: var(--accent); }
 
-  .section-title{ font-size: 13px; color: var(--text-faint); margin: 22px 4px 10px; text-align:center; }
-  .section-title .r{ display:block; font-size:11px; margin-top:2px; }
+  .section-title{ font-size:14.1px; color: var(--text-faint); margin: 22px 4px 10px; text-align:center; }
+  .section-title .r{ display:block; font-size:12.3px; margin-top:2px; }
 
   .entry{ background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; text-align:center; }
   .entry .top{ display:flex; flex-direction:column; align-items:center; gap:2px; margin-bottom:10px;}
-  .entry .date{ font-weight: 700; font-size: 15px; }
-  .entry .day{ color: var(--text-faint); font-size: 12px; font-weight:500;}
-  .entry .avl{ font-size: 12px; color: var(--text-dim); }
+  .entry .date{ font-weight: 700; font-size:15.8px; }
+  .entry .day{ color: var(--text-faint); font-size:13.3px; font-weight:500;}
+  .entry .avl{ font-size:13.3px; color: var(--text-dim); }
   .slots{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom: 8px; justify-content:center; }
-  .slot{ font-size: 10.5px; font-weight:700; padding: 5px 9px; border-radius: 8px; color: var(--text-dim); background: var(--off-dim); border: 1px solid var(--hairline); line-height:1.3; }
+  .slot{ font-size:11.8px; font-weight:700; padding: 5px 9px; border-radius: 8px; color: var(--text-dim); background: var(--off-dim); border: 1px solid var(--hairline); line-height:1.3; }
   .slot.s-run{ background: var(--run-dim); color: var(--run); border-color: transparent;}
   .slot.s-break{ background: var(--break-dim); color: var(--break); border-color: transparent;}
   .slot.s-prev{ background: var(--prev-dim); color: var(--prev); border-color: transparent;}
   .slot.s-off{ background: var(--off-dim); color: var(--off); border-color: transparent;}
   .slot .k{ opacity:0.6; margin-right:4px; font-weight:600;}
-  .entry .remark{ font-size: 12.5px; color: var(--text-dim); margin-top:6px; line-height:1.4; text-align:center; }
+  .entry .remark{ font-size:13.6px; color: var(--text-dim); margin-top:6px; line-height:1.4; text-align:center; }
   .entry .footrow{ display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:10px;}
   .minibar{ width:100%; height:6px; border-radius:999px; overflow:hidden; display:flex; background: var(--off-dim); }
   .minibar .seg-run{ background: var(--run);} .minibar .seg-break{ background: var(--break);}
   .entry.tap{ cursor:pointer; }
 
   .empty{ text-align:center; padding: 40px 20px; color: var(--text-faint); }
-  .empty .glyph{ font-size: 30px; margin-bottom: 10px; opacity:0.5;}
+  .empty .glyph{ font-size:30px; margin-bottom: 10px; opacity:0.5;}
   .empty .btn-primary{ width:auto; padding:12px 22px; margin-top:14px; display:inline-block; }
 
   .fab{
     position: fixed; right: 20px; bottom: calc(24px + var(--safe-bottom));
     width: 58px; height:58px; border-radius: 50%; background: var(--accent); color:var(--on-accent);
-    display:flex; align-items:center; justify-content:center; font-size: 28px; font-weight:400; border:none;
+    display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:400; border:none;
     box-shadow: 0 6px 20px rgba(79,163,224,0.35); z-index: 30; cursor:pointer;
   }
   .fab:active{ transform: scale(0.94); }
   .sync-pill{
     position: fixed; left:50%; transform:translateX(-50%); top: calc(10px + var(--safe-top));
-    background: var(--text); color:#fff; font-size:11.5px; font-weight:600; padding:6px 14px; border-radius:999px;
+    background: var(--text); color:#fff; font-size:12.8px; font-weight:600; padding:6px 14px; border-radius:999px;
     z-index: 50; opacity:0; pointer-events:none; transition: opacity 0.25s; text-align:center; max-width:88vw;
   }
   .sync-pill.show{ opacity:1; }
@@ -181,79 +194,79 @@
   }
   .sheet.open{ transform: translateY(0); }
   .sheet .handle{ width:36px; height:4px; background: var(--hairline); border-radius:999px; margin: 6px auto 14px;}
-  .sheet h2{ font-size:18px; margin: 0 0 14px; text-align:center; }
+  .sheet h2{ font-size:18.5px; margin: 0 0 14px; text-align:center; }
 
   .legend{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px; }
-  .legend .li{ font-size:11px; font-weight:700; padding:5px 9px; border-radius:7px; display:flex; align-items:center; gap:5px; }
+  .legend .li{ font-size:12.3px; font-weight:700; padding:5px 9px; border-radius:7px; display:flex; align-items:center; gap:5px; }
   .legend .dot{ width:7px; height:7px; border-radius:50%; flex:0 0 auto; }
 
   .seg-select{ display:grid; grid-template-columns: 1fr 1fr; gap:7px; }
   .seg-btn{ padding: 11px 6px; border-radius:9px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text-dim);
-    font-size:11.5px; font-weight:700; text-align:center; cursor:pointer; white-space:normal; word-break:break-word; line-height:1.3; }
+    font-size:12.8px; font-weight:700; text-align:center; cursor:pointer; white-space:normal; word-break:break-word; line-height:1.3; }
   .seg-btn.sel-run{ background: var(--run-dim); border-color: var(--run); color: var(--run); }
   .seg-btn.sel-break{ background: var(--break-dim); border-color: var(--break); color: var(--break); }
   .seg-btn.sel-prev{ background: var(--prev-dim); border-color: var(--prev); color: var(--prev); }
   .seg-btn.sel-off{ background: var(--off-dim); border-color: var(--off); color: var(--off); }
   .shift-block{ border: 1px solid var(--hairline); border-radius: 12px; padding: 12px; margin-bottom:12px; background: rgba(20,24,29,0.02); text-align:center; }
-  .shift-block .shift-label{ font-size:12.5px; font-weight:700; color: var(--text-dim); margin-bottom:10px; }
-  .shift-block .shift-time{ font-size:10.5px; color: var(--text-faint); font-weight:500; margin-left:4px; }
+  .shift-block .shift-label{ font-size:13.6px; font-weight:700; color: var(--text-dim); margin-bottom:10px; }
+  .shift-block .shift-time{ font-size:11.8px; color: var(--text-faint); font-weight:500; margin-left:4px; }
   .half-row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:6px;}
-  .half-label{ font-size: 10.5px; color: var(--text-faint); margin-bottom:5px; text-align:center; }
+  .half-label{ font-size:11.8px; color: var(--text-faint); margin-bottom:5px; text-align:center; }
   .live-calc{ display:flex; flex-wrap:wrap; gap:10px; margin: 4px 0 18px; }
   .live-chip{ flex:1 1 80px; background: var(--surface-2); border-radius:10px; padding:10px; text-align:center;}
-  .live-chip .n{ font-size:16px; font-weight:700; font-family:"Oswald",sans-serif;}
-  .live-chip .l{ font-size:9.5px; color: var(--text-faint); margin-top:2px;}
+  .live-chip .n{ font-size:16.8px; font-weight:700; font-family:"Oswald",sans-serif;}
+  .live-chip .l{ font-size:11px; color: var(--text-faint); margin-top:2px;}
   .sheet-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 4px; }
   .sheet-actions .btn{ flex:1 1 100px; }
   .sheet-actions .btn-danger{ flex: 0 0 auto; padding: 14px 18px; }
 
   .summary-row{ background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; cursor:pointer; text-align:center; }
-  .summary-row .name{ font-weight:700; font-size:15px; }
-  .summary-row .pct{ font-size:12px; color: var(--text-dim); margin-top:2px; margin-bottom:8px; }
-  .summary-row .eff{ font-size:11px; color: var(--text-faint); margin-top:6px; }
+  .summary-row .name{ font-weight:700; font-size:15.8px; }
+  .summary-row .pct{ font-size:13.3px; color: var(--text-dim); margin-top:2px; margin-bottom:8px; }
+  .summary-row .eff{ font-size:12.3px; color: var(--text-faint); margin-top:6px; }
   .overall{ background: linear-gradient(160deg, #E1F5ED, var(--surface)); border:1px solid var(--hairline); border-radius: var(--radius); padding: 18px; margin-bottom: 18px; text-align:center; }
-  .overall .lbl{ color: var(--text-faint); font-size:12px; margin-bottom:10px;}
-  .overall .bignum{ font-size: 32px; font-weight:700; font-family:"Oswald",sans-serif; margin-bottom:12px;}
-  .overall .split{ display:flex; justify-content:center; gap:18px; font-size:12px; color: var(--text-dim); flex-wrap:wrap; }
+  .overall .lbl{ color: var(--text-faint); font-size:13.3px; margin-bottom:10px;}
+  .overall .bignum{ font-size:32px; font-weight:700; font-family:"Oswald",sans-serif; margin-bottom:12px;}
+  .overall .split{ display:flex; justify-content:center; gap:18px; font-size:13.3px; color: var(--text-dim); flex-wrap:wrap; }
 
-  .today-badge{ background: var(--accent); color:var(--on-accent); font-size:10px; font-weight:700; padding: 2px 7px; border-radius:999px; }
-  .yesterday-badge{ background: var(--surface-2); color: var(--text-dim); border:1px solid var(--hairline); font-size:10px; font-weight:600; padding: 2px 7px; border-radius:999px; }
+  .today-badge{ background: var(--accent); color:var(--on-accent); font-size:11.5px; font-weight:700; padding: 2px 7px; border-radius:999px; }
+  .yesterday-badge{ background: var(--surface-2); color: var(--text-dim); border:1px solid var(--hairline); font-size:11.5px; font-weight:600; padding: 2px 7px; border-radius:999px; }
 
   .export-card{ background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius); padding: 16px; margin-bottom: 18px; text-align:center; }
-  .export-card .et{ font-size:14px; font-weight:700; margin-bottom:4px;}
-  .export-card .ed{ font-size:12px; color:var(--text-faint); margin-bottom:14px; line-height:1.4;}
+  .export-card .et{ font-size:15.1px; font-weight:700; margin-bottom:4px;}
+  .export-card .ed{ font-size:13.3px; color:var(--text-faint); margin-bottom:14px; line-height:1.4;}
   .export-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
-  .btn-export{ flex:1 1 130px; padding:13px 10px; border-radius:11px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; white-space:normal; }
+  .btn-export{ flex:1 1 130px; padding:13px 10px; border-radius:11px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text); font-size:14.1px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; white-space:normal; }
   .btn-export.primary{ background: var(--accent); color:var(--on-accent); border-color:var(--accent); }
   .btn-export:disabled{ opacity:0.55; }
-  .export-status{ font-size:11.5px; color: var(--text-faint); margin-top:10px; min-height:14px; }
+  .export-status{ font-size:12.8px; color: var(--text-faint); margin-top:10px; min-height:14px; }
 
   .month-nav{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom: 16px; }
   .month-arrow{ width:42px; height:42px; border-radius:50%; border:1px solid var(--hairline); background: var(--surface); color: var(--text); font-size:20px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 auto; cursor:pointer; }
   .month-arrow:disabled{ opacity:0.35; }
   .month-current{ text-align:center; }
-  .month-current .month-name{ font-size:17px; font-weight:700; }
-  .month-current .month-count{ font-size:11.5px; color: var(--text-faint); margin-top:2px; }
+  .month-current .month-name{ font-size:17.5px; font-weight:700; }
+  .month-current .month-count{ font-size:12.8px; color: var(--text-faint); margin-top:2px; }
 
   .machine-row{ background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius); padding: 13px 15px; margin-bottom: 10px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px; text-align:center; }
-  .machine-row .mn{ font-weight:700; font-size:15px; flex-basis:100%; }
-  .machine-row .me{ font-size:11.5px; color: var(--text-faint); margin-top:2px; flex-basis:100%; }
+  .machine-row .mn{ font-weight:700; font-size:15.8px; flex-basis:100%; }
+  .machine-row .me{ font-size:12.8px; color: var(--text-faint); margin-top:2px; flex-basis:100%; }
   .machine-row .ma{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
   .machine-row.archived{ opacity:0.55; }
-  .tiny-btn{ font-size:12px; font-weight:600; padding:7px 11px; border-radius:8px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text-dim); cursor:pointer; }
+  .tiny-btn{ font-size:13.3px; font-weight:600; padding:7px 11px; border-radius:8px; border:1px solid var(--hairline); background: var(--surface-2); color: var(--text-dim); cursor:pointer; }
   .tiny-btn.danger{ color: var(--break); background: var(--break-dim); border-color:transparent; }
 
   .shift-config-row{ border:1px solid var(--hairline); border-radius:12px; padding:14px; margin-bottom:12px; background: rgba(20,24,29,0.02); text-align:center; }
-  .shift-config-row .sc-title{ font-weight:700; font-size:14px; margin-bottom:10px; }
+  .shift-config-row .sc-title{ font-weight:700; font-size:15.1px; margin-bottom:10px; }
   .sc-grid{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
   .sc-field{ flex:1 1 100px; text-align:center; }
-  .sc-field label{ display:block; font-size:10.5px; color: var(--text-faint); margin-bottom:5px; font-weight:600; }
-  .sc-toggle{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px; font-size:12.5px; color: var(--text-dim); font-weight:600; }
+  .sc-field label{ display:block; font-size:11.8px; color: var(--text-faint); margin-bottom:5px; font-weight:600; }
+  .sc-toggle{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px; font-size:13.6px; color: var(--text-dim); font-weight:600; }
   .sc-toggle input{ width:17px; height:17px; }
   .stepper{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:8px; }
   .stepper .sv{ font-size:24px; font-weight:800; min-width:34px; text-align:center; }
-  .stepper button{ width:38px; height:38px; border-radius:50%; border:1px solid var(--hairline); background:var(--surface); font-size:18px; font-weight:700; cursor:pointer; }
-  .stepper-note{ font-size:11.5px; color:var(--text-faint); margin:-2px 0 16px; }
+  .stepper button{ width:38px; height:38px; border-radius:50%; border:1px solid var(--hairline); background:var(--surface); font-size:18.5px; font-weight:700; cursor:pointer; }
+  .stepper-note{ font-size:12.8px; color:var(--text-faint); margin:-2px 0 16px; }
 
   #loadingOverlay{
     position:fixed; inset:0; background: var(--bg); z-index:100; display:flex; align-items:center; justify-content:center;
@@ -261,10 +274,10 @@
   }
   #loadingOverlay .spin{ width:28px; height:28px; border-radius:50%; border:3px solid var(--hairline); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
   @keyframes spin{ to{ transform: rotate(360deg); } }
-  #loadingOverlay .lbl{ font-size:13px; color: var(--text-faint); }
+  #loadingOverlay .lbl{ font-size:14.1px; color: var(--text-faint); }
 
   #appFooter{ max-width: 640px; margin: 8px auto 0; padding: 18px 24px calc(24px + var(--safe-bottom)); text-align: center; border-top: 1px solid var(--hairline); }
-  #appFooter .footer-line{ font-size: 11px; color: var(--text-faint); }
+  #appFooter .footer-line{ font-size:12.3px; color: var(--text-faint); }
 </style>
 </head>
 <body>
@@ -414,7 +427,7 @@
     <label>Factory / shop name</label>
     <input type="text" id="f-factoryNameEdit" placeholder="e.g. Shree Precision Works">
   </div>
-  <div style="font-size:11.5px;color:var(--text-faint);margin:-6px 0 16px;">
+  <div style="font-size:12.8px;color:var(--text-faint);margin:-6px 0 16px;">
     Shift schedules are set per machine now — open a machine under 🏭 Manage machines to set its shifts.
   </div>
 
@@ -727,6 +740,19 @@
   function round1(n){ return Math.round(n*10)/10; }
   function escapeHtml(s){ var d = document.createElement("div"); d.textContent = s||""; return d.innerHTML; }
 
+  // Circular status ring: green/red conic-gradient split by Running vs
+  // Breakdown share of Available hours, with a number in the center hole.
+  function donutHTML(pctRun, centerNum, centerLbl, size){
+    size = size || 140;
+    if(pctRun == null){
+      return '<div class="donut nodata" style="width:'+size+'px;height:'+size+'px;">'+
+        '<div class="donut-hole"><div class="donut-center"><div class="dc-num" style="color:var(--text-faint)">'+centerNum+'</div>'+(centerLbl?'<div class="dc-lbl">'+centerLbl+'</div>':'')+'</div></div></div>';
+    }
+    var p = Math.max(0, Math.min(100, pctRun));
+    return '<div class="donut" style="width:'+size+'px;height:'+size+'px;background:conic-gradient(var(--run) 0% '+p+'%, var(--break) '+p+'% 100%);">'+
+      '<div class="donut-hole"><div class="donut-center"><div class="dc-num">'+centerNum+'</div>'+(centerLbl?'<div class="dc-lbl">'+centerLbl+'</div>':'')+'</div></div></div>';
+  }
+
   // ---------- Render: chips ----------
   function renderChips(){
     var el = $("machineScroll");
@@ -775,17 +801,20 @@
     var rows = (state.data[machineId]||[]).slice().sort(function(a,b){ return a.date < b.date ? 1 : -1; });
     var tot = machineTotals(machineId);
 
+    var hasData = tot.avl > 0;
     var card = document.createElement("div");
     card.className = "statcard";
     card.innerHTML =
       '<div class="machine-name">'+escapeHtml(m.name)+'</div>'+
       '<div class="month-label">'+rows.length+' entries logged</div>'+
-      '<div class="bigstats">'+
+      donutHTML(hasData ? tot.pctRun : null, hasData ? pct(tot.pctRun) : "No data", "Running", 148)+
+      '<div class="donut-legend"><span><span class="dot" style="background:var(--run)"></span>Running '+round1(tot.runHrs)+'h</span>'+
+      '<span><span class="dot" style="background:var(--break)"></span>Breakdown '+round1(tot.breakHrs)+'h</span></div>'+
+      '<div class="bigstats" style="margin-top:14px;">'+
         '<div class="bigstat run"><div class="num">'+round1(tot.runHrs)+'h</div><div class="lbl">Running</div></div>'+
         '<div class="bigstat break"><div class="num">'+round1(tot.breakHrs)+'h</div><div class="lbl">Breakdown</div></div>'+
         '<div class="bigstat"><div class="num" style="color:var(--text-dim)">'+round1(tot.avl)+'h</div><div class="lbl">Available</div></div>'+
       '</div>'+
-      '<div class="bar"><div class="seg-run" style="width:'+tot.pctRun+'%"></div><div class="seg-break" style="width:'+tot.pctBreak+'%"></div></div>'+
       '<div class="eff-row"><span class="ul">Running Efficiency</span><span class="uv">'+pct(tot.pctEfficiency)+'</span></div>'+
       '<div class="eff-bar"><div class="fill" style="width:'+tot.pctEfficiency+'%"></div></div>';
     main.appendChild(card);
@@ -818,7 +847,7 @@
         '<div class="slots">'+slotsHtml+'</div>'+
         (row.remark ? '<div class="remark">'+escapeHtml(row.remark)+'</div>' : '')+
         '<div class="footrow"><div class="minibar"><div class="seg-run" style="width:'+c.pctRun+'%"></div><div class="seg-break" style="width:'+c.pctBreak+'%"></div></div>'+
-        '<span style="font-size:11px;color:var(--text-faint)">'+pct(c.pctRun)+' running</span></div>';
+        '<span style="font-size:12.3px;color:var(--text-faint)">'+pct(c.pctRun)+' running</span></div>';
       e.onclick = function(){ openSheet(machineId, row.date); };
       main.appendChild(e);
     });
@@ -843,15 +872,16 @@
     $("monthPrev").onclick = function(){ state.summaryMonth = shiftMonth(mKey,-1); renderAll(); };
     $("monthNext").onclick = function(){ state.summaryMonth = shiftMonth(mKey,1); renderAll(); };
 
+    var overallHasData = overallA > 0;
+    var overallPctRun = overallA ? overallR/overallA*100 : 0;
     var ov = document.createElement("div");
     ov.className = "overall";
     ov.innerHTML =
       '<div class="lbl">ALL MACHINES · AVAILABLE HOURS · '+monthLabel(mKey).toUpperCase()+'</div>'+
-      '<div class="bignum">'+round1(overallA)+'h</div>'+
-      '<div class="bar" style="height:10px;margin-bottom:10px;"><div class="seg-run" style="width:'+(overallA?overallR/overallA*100:0)+'%"></div><div class="seg-break" style="width:'+(overallA?overallB/overallA*100:0)+'%"></div></div>'+
-      '<div class="split">'+
-      '<span style="color:var(--run)">● Running '+pct(overallA?overallR/overallA*100:0)+'</span>'+
-      '<span style="color:var(--break)">● Breakdown '+pct(overallA?overallB/overallA*100:0)+'</span></div>';
+      donutHTML(overallHasData ? overallPctRun : null, overallHasData ? round1(overallA)+"h" : "No data", "Available Hours", 152)+
+      '<div class="donut-legend" style="margin-top:12px;">'+
+      '<span><span class="dot" style="background:var(--run)"></span>Running '+pct(overallPctRun)+'</span>'+
+      '<span><span class="dot" style="background:var(--break)"></span>Breakdown '+pct(overallA?overallB/overallA*100:0)+'</span></div>';
     main.appendChild(ov);
 
     if(activeMachines.length){
@@ -886,10 +916,11 @@
       var t = machineTotals(m.id, mKey);
       var row = document.createElement("div");
       row.className = "summary-row";
+      var rowHasData = t.avl > 0;
       row.innerHTML =
         '<div class="name">'+escapeHtml(m.name)+'</div>'+
+        donutHTML(rowHasData ? t.pctRun : null, rowHasData ? pct(t.pctRun) : "—", "", 76)+
         '<div class="pct">'+round1(t.runHrs)+'h run · '+round1(t.breakHrs)+'h down</div>'+
-        '<div class="bar"><div class="seg-run" style="width:'+t.pctRun+'%"></div><div class="seg-break" style="width:'+t.pctBreak+'%"></div></div>'+
         '<div class="eff">Running efficiency: '+pct(t.pctEfficiency)+'</div>';
       row.onclick = function(){ state.active = m.id; renderAll(); window.scrollTo(0,0); };
       main.appendChild(row);
@@ -1085,7 +1116,7 @@
     if(old) old.remove();
     var totalNote = document.createElement("div");
     totalNote.id = "mShiftTotalNote";
-    totalNote.style.cssText = "font-size:11.5px;color:var(--text-faint);margin:-4px 0 16px;";
+    totalNote.style.cssText = "font-size:12.8px;color:var(--text-faint);margin:-4px 0 16px;";
     totalNote.textContent = "Total configured hours/day for this machine: " + totalDailyHours(state.machineDraftShifts) + "h — used for Running Efficiency.";
     $("mShiftConfigList").appendChild(totalNote);
   }
@@ -1105,7 +1136,7 @@
     var list = $("machineList");
     list.innerHTML = "";
     if(state.machines.length===0){
-      list.innerHTML = '<div style="font-size:12.5px;color:var(--text-faint);padding:4px 2px 12px;">No machines yet — add your first one below.</div>';
+      list.innerHTML = '<div style="font-size:13.6px;color:var(--text-faint);padding:4px 2px 12px;">No machines yet — add your first one below.</div>';
       return;
     }
     state.machines.forEach(function(m){
@@ -1113,7 +1144,7 @@
       var row = document.createElement("div");
       row.className = "machine-row" + (m.active===false ? " archived" : "");
       row.innerHTML =
-        '<div class="mn">'+escapeHtml(m.name)+(m.active===false?' <span style="font-size:10px;color:var(--text-faint);">(archived)</span>':'')+'</div>'+
+        '<div class="mn">'+escapeHtml(m.name)+(m.active===false?' <span style="font-size:11.5px;color:var(--text-faint);">(archived)</span>':'')+'</div>'+
         '<div class="me">'+shiftsN+' shift'+(shiftsN===1?"":"s")+' / day &middot; '+totalDailyHours(machineShiftConfig(m))+'h configured</div>'+
         '<div class="ma">'+
           '<button class="tiny-btn" data-act="edit">Edit</button>'+
@@ -1225,40 +1256,84 @@
     if(dlBtn) dlBtn.disabled = true; if(emBtn) emBtn.disabled = true;
     setExportStatus(mode==="share" ? "Preparing file to share…" : "Preparing download…");
 
-    setTimeout(function(){
-      try{
-        var mKey = state.summaryMonth;
-        var wb = buildWorkbook(mKey);
-        var wbout = XLSX.write(wb, {bookType:"xlsx", type:"array"});
-        var blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-        var filename = "MachineTrack-"+state.factoryName.replace(/[^a-z0-9]+/gi,"-")+"-"+mKey+".xlsx";
+    // IMPORTANT: this runs synchronously (no setTimeout) on purpose.
+    // navigator.share() only works when called directly inside a user
+    // gesture (the click handler) — even a short setTimeout delay breaks
+    // that "user activation" chain in most browsers, silently fails the
+    // share call, and falls through to the download-only fallback below.
+    // That was previously causing "Email it" to just download the file.
+    try{
+      var mKey = state.summaryMonth;
+      var wb = buildWorkbook(mKey);
+      var wbout = XLSX.write(wb, {bookType:"xlsx", type:"array"});
+      var blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+      var filename = "MachineTrack-"+state.factoryName.replace(/[^a-z0-9]+/gi,"-")+"-"+mKey+".xlsx";
 
-        if(mode==="download"){
-          downloadBlob(blob, filename);
-          setExportStatus("Downloaded "+filename);
+      if(mode==="download"){
+        downloadBlob(blob, filename);
+        setExportStatus("Downloaded "+filename);
+      } else {
+        var file = new File([blob], filename, {type: blob.type});
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+          navigator.share({ files: [file], title: "Machine Status Summary — "+monthLabel(mKey), text: "Machine status summary for "+monthLabel(mKey) })
+            .then(function(){ setExportStatus("Shared. Pick your email app from the share sheet."); })
+            .catch(function(err){
+              if(err && err.name === "AbortError"){ setExportStatus(""); }
+              else { setExportStatus("Couldn't share — file was downloaded instead."); downloadBlob(blob, filename); }
+            })
+            .finally(function(){ if(dlBtn) dlBtn.disabled = false; if(emBtn) emBtn.disabled = false; });
+          return; // async branch handles re-enabling buttons itself
         } else {
-          var file = new File([blob], filename, {type: blob.type});
-          if(navigator.canShare && navigator.canShare({files:[file]})){
-            navigator.share({ files: [file], title: "Machine Status Summary — "+monthLabel(mKey), text: "Machine status summary for "+monthLabel(mKey) })
-              .then(function(){ setExportStatus("Shared. Pick your email app from the share sheet."); })
-              .catch(function(err){
-                if(err && err.name === "AbortError"){ setExportStatus(""); }
-                else { setExportStatus("Couldn't share — file was downloaded instead."); downloadBlob(blob, filename); }
-              });
-          } else {
-            downloadBlob(blob, filename);
-            setExportStatus("Downloaded "+filename+" — attach it in the email that just opened.");
-            window.location.href = "mailto:?subject="+encodeURIComponent("Machine Status Summary — "+monthLabel(mKey))+
-              "&body="+encodeURIComponent("Hi,\n\nPlease find the machine status summary attached ("+filename+").\n\nThis device's browser can't attach files automatically — please attach the file that was just downloaded before sending.");
-          }
+          downloadBlob(blob, filename);
+          setExportStatus("Downloaded "+filename+" — attach it in the email that just opened.");
+          window.location.href = "mailto:?subject="+encodeURIComponent("Machine Status Summary — "+monthLabel(mKey))+
+            "&body="+encodeURIComponent("Hi,\n\nPlease find the machine status summary attached ("+filename+").\n\nThis device's browser can't attach files automatically — please attach the file that was just downloaded before sending.");
         }
-      } catch(e){
-        setExportStatus("Something went wrong generating the file. Please try again.");
-      } finally {
-        if(dlBtn) dlBtn.disabled = false; if(emBtn) emBtn.disabled = false;
       }
-    }, 30);
+    } catch(e){
+      setExportStatus("Something went wrong generating the file. Please try again.");
+    } finally {
+      if(dlBtn) dlBtn.disabled = false; if(emBtn) emBtn.disabled = false;
+    }
   }
+
+  // ---------- Swipe between machines / Summary ----------
+  // Horizontal swipe on the main content area moves to the next/previous
+  // machine tab (wrapping through Summary at the ends). Ignored while any
+  // sheet is open, and ignored when the gesture is mostly vertical (page
+  // scroll) rather than horizontal.
+  function tabOrder(){
+    return state.machines.filter(function(m){ return m.active !== false; }).map(function(m){ return m.id; }).concat(["__SUMMARY__"]);
+  }
+  function anySheetOpen(){
+    return $("sheet").classList.contains("open") || $("machineSheet").classList.contains("open") || $("settingsSheet").classList.contains("open");
+  }
+  (function setupSwipe(){
+    var touchStartX = 0, touchStartY = 0, tracking = false;
+    var mainEl = $("main");
+    mainEl.addEventListener("touchstart", function(e){
+      if(anySheetOpen() || e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      tracking = true;
+    }, {passive:true});
+    mainEl.addEventListener("touchend", function(e){
+      if(!tracking) return;
+      tracking = false;
+      if(anySheetOpen()) return;
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      var dy = e.changedTouches[0].clientY - touchStartY;
+      if(Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.4) return; // require a clearly-horizontal, deliberate swipe
+      var order = tabOrder();
+      if(order.length < 2) return;
+      var idx = order.indexOf(state.active);
+      if(idx === -1) idx = 0;
+      idx = dx < 0 ? (idx + 1) % order.length : (idx - 1 + order.length) % order.length;
+      state.active = order[idx];
+      renderAll();
+      window.scrollTo(0,0);
+    }, {passive:true});
+  })();
 
   // ---------- Service worker (PWA) ----------
   if("serviceWorker" in navigator){
