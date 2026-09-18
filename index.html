@@ -1250,6 +1250,13 @@
   }
   function setExportStatus(msg){ var el = $("exportStatus"); if(el) el.textContent = msg; }
 
+  function openMailFallback(blob, filename, mKey){
+    downloadBlob(blob, filename);
+    setExportStatus("Downloaded "+filename+" — attach it in the email that just opened.");
+    window.location.href = "mailto:?subject="+encodeURIComponent("Machine Status Summary — "+monthLabel(mKey))+
+      "&body="+encodeURIComponent("Hi,\n\nPlease find the machine status summary attached ("+filename+").\n\nThis device's browser can't attach files automatically — please attach the file that was just downloaded before sending.");
+  }
+
   function handleExport(mode){
     if(typeof XLSX === "undefined"){ setExportStatus("Couldn't load the Excel library — check your internet connection and try again."); return; }
     var dlBtn = $("btnDownloadXlsx"), emBtn = $("btnEmailXlsx");
@@ -1278,16 +1285,18 @@
           navigator.share({ files: [file], title: "Machine Status Summary — "+monthLabel(mKey), text: "Machine status summary for "+monthLabel(mKey) })
             .then(function(){ setExportStatus("Shared. Pick your email app from the share sheet."); })
             .catch(function(err){
+              // AbortError just means the person closed the share sheet
+              // themselves — leave them alone. Any other failure means
+              // this device rejected sharing an .xlsx file that way, so
+              // fall back to download + a blank email ready to attach it,
+              // rather than a dead-end error message.
               if(err && err.name === "AbortError"){ setExportStatus(""); }
-              else { setExportStatus("Couldn't share — file was downloaded instead."); downloadBlob(blob, filename); }
+              else { openMailFallback(blob, filename, mKey); }
             })
             .finally(function(){ if(dlBtn) dlBtn.disabled = false; if(emBtn) emBtn.disabled = false; });
           return; // async branch handles re-enabling buttons itself
         } else {
-          downloadBlob(blob, filename);
-          setExportStatus("Downloaded "+filename+" — attach it in the email that just opened.");
-          window.location.href = "mailto:?subject="+encodeURIComponent("Machine Status Summary — "+monthLabel(mKey))+
-            "&body="+encodeURIComponent("Hi,\n\nPlease find the machine status summary attached ("+filename+").\n\nThis device's browser can't attach files automatically — please attach the file that was just downloaded before sending.");
+          openMailFallback(blob, filename, mKey);
         }
       }
     } catch(e){
