@@ -48,7 +48,20 @@
     min-height: 100%;
     overflow-wrap: anywhere;
   }
-  .display{ font-family: "Oswald", "Arial Narrow", "Segoe UI", sans-serif; font-weight:600; letter-spacing: 0.01em; }
+    .display{ font-family: "Oswald", "Arial Narrow", "Segoe UI", sans-serif; font-weight:600; letter-spacing: 0.01em; }
+
+  /* ---------- Shared motion system: every card, button, chip and donut in
+     the app uses these same keyframes/timings so the feel is consistent
+     throughout rather than ad-hoc per element. ---------- */
+  @property --p{ syntax:'<percentage>'; inherits:false; initial-value:0%; }
+  @keyframes cardIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes popIn{ from{ opacity:0; transform:scale(0.92); } to{ opacity:1; transform:scale(1); } }
+  @keyframes fabPulse{ 0%,100%{ box-shadow:0 6px 20px rgba(79,163,224,0.35); } 50%{ box-shadow:0 6px 26px rgba(79,163,224,0.6); } }
+  .chip, .icon-btn, .btn, .btn-export, .tiny-btn, .seg-btn, .month-arrow, .entry.tap, .summary-row, .machine-row{
+    transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .chip:active, .icon-btn:active, .btn:active, .btn-export:active, .tiny-btn:active, .seg-btn:active, .month-arrow:active{ transform: scale(0.95); }
+  .entry.tap:active, .summary-row:active, .machine-row:active{ transform: scale(0.985); }
   button, input, textarea, select{ font-family: inherit; max-width:100%; }
   img, svg{ max-width:100%; }
 
@@ -116,7 +129,8 @@
 
   main{ padding: 16px; max-width: 640px; margin: 0 auto; width:100%; }
 
-  .statcard, .entry, .summary-row, .export-card, .machine-row{ box-shadow: 0 1px 3px rgba(20,24,29,0.05); }
+  .statcard, .entry, .summary-row, .export-card, .machine-row, .overall, .shift-config-row{ box-shadow: 0 1px 3px rgba(20,24,29,0.05); }
+  .statcard, .entry, .summary-row, .export-card, .machine-row, .overall{ animation: cardIn 0.4s cubic-bezier(.2,.8,.2,1) both; }
   .statcard{ background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; text-align:center; }
   .statcard .machine-name{ font-size:19px; font-weight:700; }
   .statcard .month-label{ font-size:13.3px; color: var(--text-faint); margin-top:2px; margin-bottom:14px; }
@@ -130,9 +144,9 @@
   .bar .seg-run{ background: var(--run); }
   .bar .seg-break{ background: var(--break); }
 
-  .donut{ border-radius:50%; margin:0 auto 14px; position:relative; flex:0 0 auto; }
+  .donut{ border-radius:50%; margin:0 auto 14px; position:relative; flex:0 0 auto; transition: --p 0.9s cubic-bezier(.22,.9,.3,1); }
   .donut.nodata{ background:var(--off-dim) !important; }
-  .donut-hole{ position:absolute; inset:14%; background: var(--surface); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 0 1px var(--hairline); }
+    .donut-hole{ position:absolute; inset:14%; background: var(--surface); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 0 1px var(--hairline); animation: popIn 0.5s cubic-bezier(.22,.9,.3,1) both; animation-delay:0.15s; }
   .donut-center{ text-align:center; padding:4px; }
   .donut-center .dc-num{ font-size:21.5px; font-weight:700; font-family:"Oswald",sans-serif; line-height:1.1; }
   .donut-center .dc-lbl{ font-size:9.8px; color: var(--text-faint); margin-top:3px; line-height:1.25; max-width:74px; }
@@ -140,7 +154,7 @@
   .donut-legend .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:5px; vertical-align:middle; }
   .eff-row{ display:flex; justify-content:center; align-items:center; gap:8px; margin-top:14px; padding-top:12px; border-top:1px dashed var(--hairline); flex-wrap:wrap; }
   .eff-row .ul{ font-size:13.3px; color: var(--text-faint); }
-  .eff-row .uv{ font-size:15.1px; font-weight:700; color: var(--accent); }
+  .eff-row .uv{ font-size:15.1px; font-weight:700; color: var(--accent); font-family:"Oswald",sans-serif; }
   .eff-bar{ height:6px; border-radius:999px; background: var(--off-dim); margin-top:8px; overflow:hidden; }
   .eff-bar .fill{ height:100%; background: var(--accent); }
 
@@ -173,9 +187,10 @@
     position: fixed; right: 20px; bottom: calc(24px + var(--safe-bottom));
     width: 58px; height:58px; border-radius: 50%; background: var(--accent); color:var(--on-accent);
     display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:400; border:none;
-    box-shadow: 0 6px 20px rgba(79,163,224,0.35); z-index: 30; cursor:pointer;
+      box-shadow: 0 6px 20px rgba(79,163,224,0.35); z-index: 30; cursor:pointer;
+    animation: fabPulse 2.6s ease-in-out infinite; transition: transform 0.15s ease;
   }
-  .fab:active{ transform: scale(0.94); }
+  .fab:active{ transform: scale(0.94); animation: none; }
   .sync-pill{
     position: fixed; left:50%; transform:translateX(-50%); top: calc(10px + var(--safe-top));
     background: var(--text); color:#fff; font-size:12.8px; font-weight:600; padding:6px 14px; border-radius:999px;
@@ -748,8 +763,8 @@
       return '<div class="donut nodata" style="width:'+size+'px;height:'+size+'px;">'+
         '<div class="donut-hole"><div class="donut-center"><div class="dc-num" style="color:var(--text-faint)">'+centerNum+'</div>'+(centerLbl?'<div class="dc-lbl">'+centerLbl+'</div>':'')+'</div></div></div>';
     }
-    var p = Math.max(0, Math.min(100, pctRun));
-    return '<div class="donut" style="width:'+size+'px;height:'+size+'px;background:conic-gradient(var(--run) 0% '+p+'%, var(--break) '+p+'% 100%);">'+
+        var p = Math.max(0, Math.min(100, pctRun));
+    return '<div class="donut" data-target-pct="'+p+'" style="width:'+size+'px;height:'+size+'px;--p:0%;background:conic-gradient(var(--run) 0% var(--p), var(--break) var(--p) 100%);">'+
       '<div class="donut-hole"><div class="donut-center"><div class="dc-num">'+centerNum+'</div>'+(centerLbl?'<div class="dc-lbl">'+centerLbl+'</div>':'')+'</div></div></div>';
   }
 
@@ -790,9 +805,23 @@
       return;
     }
 
-    $("fabAdd").style.display = state.active==="__SUMMARY__" ? "none" : "flex";
+        $("fabAdd").style.display = state.active==="__SUMMARY__" ? "none" : "flex";
     if(state.active === "__SUMMARY__" || !machineById(state.active)){ renderSummary(main); }
     else { renderMachine(main, state.active); }
+    animateDonuts();
+  }
+
+  // Lets each donut ring animate its fill in from 0, rather than appearing
+  // already-drawn. Double rAF ensures the browser has painted the starting
+  // --p:0% state first so the transition to the target actually plays.
+  function animateDonuts(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        document.querySelectorAll(".donut[data-target-pct]").forEach(function(el){
+          el.style.setProperty("--p", el.getAttribute("data-target-pct")+"%");
+        });
+      });
+    });
   }
 
   function renderMachine(main, machineId){
@@ -832,10 +861,11 @@
       return;
     }
 
-    rows.forEach(function(row){
+      rows.forEach(function(row, idx){
       var c = computeRow(row, shiftConfig);
       var e = document.createElement("div");
       e.className = "entry tap";
+      e.style.animationDelay = Math.min(idx*0.045, 0.4)+"s";
       var slotsHtml = getSlotDefs(shiftConfig).map(function(slot){
         var st2 = STATUS_MAP[row[slot.key]];
         if(!st2) return "";
@@ -912,10 +942,11 @@
       return;
     }
 
-    activeMachines.forEach(function(m){
+      activeMachines.forEach(function(m, idx){
       var t = machineTotals(m.id, mKey);
       var row = document.createElement("div");
       row.className = "summary-row";
+      row.style.animationDelay = Math.min(idx*0.05, 0.4)+"s";
       var rowHasData = t.avl > 0;
       row.innerHTML =
         '<div class="name">'+escapeHtml(m.name)+'</div>'+
