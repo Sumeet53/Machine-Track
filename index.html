@@ -60,7 +60,7 @@
   .auth-card{ width:100%; max-width: 380px; text-align:left; }
   .auth-brand{ text-align:center; margin-bottom: 28px; }
   .auth-brand .wordmark{ display:flex; align-items:center; justify-content:center; gap:9px; margin-bottom:6px; }
-  .auth-brand .glyph{ font-size:26px; line-height:1; }
+  .auth-brand .glyph{ width:26px; height:26px; border-radius:6px; display:block; }
   .auth-brand h1{ margin:0; font-size:25px; font-weight:800; letter-spacing:-0.01em; }
   .auth-brand .tag{ color: var(--text-faint); font-size:13.6px; line-height:1.4; }
   .auth-tabs{ display:flex; background: var(--surface-2); border-radius: 12px; padding:4px; margin-bottom: 20px; }
@@ -95,7 +95,7 @@
   }
   .brand-block{ text-align:center; margin-bottom:12px; }
   .brand-block .wordmark{ display:flex; align-items:center; justify-content:center; gap:8px; }
-  .brand-block .glyph{ font-size:20px; line-height:1; }
+  .brand-block .glyph{ width:20px; height:20px; border-radius:5px; display:block; }
   .brand-block h1{ margin:0; font-size:20px; font-weight: 800; letter-spacing: -0.01em; }
   .brand-block .tag{ color: var(--text-faint); font-size:12.3px; margin-top:3px; font-weight:600; letter-spacing:0.02em; }
   .header-actions{ display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
@@ -289,7 +289,7 @@
 <div id="authScreen" style="display:none;">
   <div class="auth-card">
     <div class="auth-brand">
-      <div class="wordmark"><span class="glyph">⏱</span><h1 class="display">MachineTrack</h1></div>
+      <div class="wordmark"><img class="glyph" src="icons/icon-192.png" alt="MachineTrack logo"><h1 class="display">MachineTrack</h1></div>
       <div class="tag">Simple Machine Uptime &amp; Maintenance Monitoring</div>
     </div>
 
@@ -330,7 +330,7 @@
 <div id="appShell">
   <header>
     <div class="brand-block">
-      <div class="wordmark"><span class="glyph">⏱</span><h1 class="display">MachineTrack</h1></div>
+      <div class="wordmark"><img class="glyph" src="icons/icon-192.png" alt="MachineTrack logo"><h1 class="display">MachineTrack</h1></div>
       <div class="tag" id="factoryTag">MACHINE STATUS</div>
     </div>
     <div class="header-actions">
