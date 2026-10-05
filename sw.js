@@ -4,7 +4,7 @@
 // (googleapis.com) are left untouched — Firestore's own offline
 // persistence (enabled in index.html) handles those.
 
-var CACHE_NAME = "machinetrack-shell-v4";
+var CACHE_NAME = "machinetrack-shell-v5";
 var SHELL_FILES = [
   "./",
   "./index.html",
