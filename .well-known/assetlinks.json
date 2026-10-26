@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "io.github.sumeet53.twa",
-        "sha256_cert_fingerprints": ["B2:2C:89:13:BD:8D:3F:4A:5F:CC:C1:48:67:F8:EA:70:82:2F:E7:8D:51:22:55:AF:6B:05:D7:BE:9F:85:89:51"]
+        "package_name": "com.opalunalabs.machinetrack",
+        "sha256_cert_fingerprints": ["F8:57:A0:36:5D:78:F7:3C:4C:CE:5A:CB:9C:A6:E6:DB:B1:BF:85:19:87:76:D9:51:D6:71:27:B5:BF:2B:2E:C6"]
       }
     }]
